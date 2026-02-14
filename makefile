@@ -1,8 +1,10 @@
 SHELL:=$(if $(windir),cmd.exe,/bin/sh)
 
-run/cgi:
+cgi/serve:
 	go run ./cgi/
 
+cgi/build:
+	go build -ldflags "-w -s" ./cgi/
 
-shell:
-	echo $(shell git rev-parse HEAD)
+commit_id:
+	@echo $(shell git rev-parse HEAD)

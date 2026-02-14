@@ -6,9 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"murphyl.com/lego/cgi/internal/golego/interfaces"
 )
 
 type LegoApp struct {
@@ -17,13 +15,34 @@ type LegoApp struct {
 	ctx context.Context
 }
 
-func NewLegoApp(appConfig *interfaces.AppConfig) *LegoApp {
-	conf := &interfaces.AppConfig{}
+type AppContext struct {
+	AppTitle    string
+	BindAddress string
+	// 应用默认数据库
+	DataSourceName string
+}
+
+func NewLegoApp(appConfig *AppContext) *LegoApp {
 	app := &LegoApp{ctx: context.Background()}
+	/**
+	var err error
+	// 数据库
+	app.DB, err = gorm.Open(mysql.Open(appConfig.DataSourceName), &gorm.Config{
+		AllowGlobalUpdate: false,
+	})
+	if err != nil {
+		panic("连接默认数据库出错：" + err.Error())
+	}
+	sqlDb, _ := app.DB.DB()
+	sqlDb.SetMaxIdleConns(15)
+	sqlDb.SetMaxOpenConns(25)
+	sqlDb.SetConnMaxLifetime(5 * time.Minute)
+	**/
+	// 应用服务
 	app.App = fiber.New(fiber.Config{
 		CaseSensitive: true,
 		StrictRouting: true,
-		AppName:       conf.AppTitle,
+		AppName:       appConfig.AppTitle,
 	})
 	return app
 }
@@ -40,15 +59,6 @@ func GetEnv(key, defaultValue string) string {
 	return value
 }
 
-func NewLegoRepo(ctx context.Context) *gorm.DB {
-	dsn := ctx.Value(UniqueId("REPO", "DEFAULT")).(string)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	return db
-}
-
-func (app *LegoApp) UseDomain(domain interfaces.Domain) {
-
+func (app *LegoApp) RetrieveOne(endpoint string, handler func(c fiber.Ctx) error) {
+	app.App.Get("/api"+endpoint, handler)
 }

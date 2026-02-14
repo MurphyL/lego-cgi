@@ -1,13 +1,5 @@
 package interfaces
 
-type AppConfig struct {
-	AppTitle    string
-	BindAddress string
-	// 应用默认数据库
-	DataSourceName string
-	DriverName     string
-}
-
 type DictType struct {
 	DictCode string
 	DictName string
