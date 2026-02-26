@@ -1,6 +1,10 @@
 go 1.25.0
 
 use (
-./app/hrs
-./cgi
+	./app/hrs
+	./cgi
+	./dal
+	./misc
+	./cgi/extends/idm
+	./cgi/extends/sys
 )

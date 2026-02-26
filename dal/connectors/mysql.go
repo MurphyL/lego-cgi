@@ -6,7 +6,11 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"murphyl.com/lego/misc"
 )
+
+var sugarLogger = misc.NewSugarLogger()
 
 // root:123456@tcp(localhost:3306)/tizi365?charset=utf8&parseTime=True&loc=Local
 type MySqlConn struct {
@@ -17,8 +21,9 @@ type MySqlConn struct {
 	Database string
 }
 
-func NewMySqlConnection() gorm.Dialector {
-	return mysql.Open("")
+func OpenMySqlConnection(dsn string) gorm.Dialector {
+	sugarLogger.Infoln("连接 MySQL 数据库")
+	return mysql.Open(dsn)
 }
 
 func (conn *MySqlConn) DatasourceName() string {

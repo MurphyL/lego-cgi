@@ -1,9 +1,17 @@
 package main
 
 import (
+	"murphyl.com/app/idm"
+	"murphyl.com/app/sys"
 	"murphyl.com/lego/cgi"
-	"murphyl.com/lego/cgi/domain/account"
-	"murphyl.com/lego/cgi/misc"
+	"murphyl.com/lego/dal"
+	"murphyl.com/lego/misc"
+)
+
+var (
+	AppTitle       = "房源智管"
+	BindAddr       = ":4000"
+	DataSourceName = ""
 )
 
 type AppConfig struct {
@@ -15,16 +23,18 @@ type AppConfig struct {
 
 func main() {
 	cnf := loadConfig()
-	app := cgi.NewLegoApp(cnf)
-	app.RetrieveOne("/user/profile", account.GetProfilefunc)
-	app.Listen(cnf.BindAddress())
+	dao := dal.New("mysql", cnf.dsn)
+	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
+	app.Mount("/account", idm.UseIdentifyManager)
+	app.Mount("/system", sys.UseSystemDictManager)
+	app.Serve(cnf.BindAddress())
 }
 
 func loadConfig() *AppConfig {
 	appConfig := &AppConfig{}
-	misc.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", "接口网关", "应用标题")
-	misc.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", ":4044", "应用绑定地址")
-	misc.LoadProperty(&appConfig.dsn, "DATASOURCE_NAME", "", "数据库连接地址")
+	misc.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", AppTitle, "应用标题")
+	misc.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", BindAddr, "应用绑定地址")
+	misc.LoadProperty(&appConfig.dsn, "DATASOURCE_NAME", DataSourceName, "数据库连接地址")
 	return appConfig
 }
 
@@ -33,9 +43,9 @@ func (c AppConfig) AppTitle() string {
 }
 
 func (c AppConfig) BindAddress() string {
-	return ":4000"
+	return c.addr
 }
 
 func (c AppConfig) DataSourceName() string {
-	return ":4000"
+	return c.dsn
 }
