@@ -1,8 +1,11 @@
-package mysql
+package connectors
 
 import (
 	"fmt"
 	"net/url"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 // root:123456@tcp(localhost:3306)/tizi365?charset=utf8&parseTime=True&loc=Local
@@ -12,6 +15,10 @@ type MySqlConn struct {
 	Protocol string
 	Address  string
 	Database string
+}
+
+func NewMySqlConnection() gorm.Dialector {
+	return mysql.Open("")
 }
 
 func (conn *MySqlConn) DatasourceName() string {
