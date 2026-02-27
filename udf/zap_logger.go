@@ -1,4 +1,4 @@
-package misc
+package udf
 
 import (
 	"github.com/natefinch/lumberjack"
@@ -6,11 +6,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var zapLogger *zap.Logger
-
-func init() {
-	zapLogger = newZapLogger()
-}
+var zapLogger = newZapLogger()
 
 func NewSugarLogger() *zap.SugaredLogger {
 	return zapLogger.Sugar()

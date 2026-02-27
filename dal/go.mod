@@ -5,10 +5,10 @@ go 1.25.0
 require (
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
-	murphyl.com/lego/misc v0.0.0
+	murphyl.com/lego/udf v0.0.0
 )
 
-replace murphyl.com/lego/misc => ../misc
+replace murphyl.com/lego/udf => ../udf
 
 
 require (

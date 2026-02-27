@@ -1,4 +1,4 @@
-package handlers
+package iam
 
 import (
 	"errors"

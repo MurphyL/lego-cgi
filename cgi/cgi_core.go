@@ -9,10 +9,10 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/misc"
+	"murphyl.com/lego/udf"
 )
 
-var sugarLogger = misc.NewSugarLogger()
+var sugarLogger = udf.NewSugarLogger()
 
 type LegoApp struct {
 	app *fiber.App
@@ -25,31 +25,17 @@ type AppContext interface {
 }
 
 func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
-	la := &LegoApp{ctx: context.Background()}
-	/**
-	var err error
-	// 数据库
-	app.DB, err = gorm.Open(mysql.Open(appConfig.DataSourceName), &gorm.Config{
-		AllowGlobalUpdate: false,
-	})
-	if err != nil {
-		panic("连接默认数据库出错：" + err.Error())
-	}
-	sqlDb, _ := app.DB.DB()
-	sqlDb.SetMaxIdleConns(15)
-	sqlDb.SetMaxOpenConns(25)
-	sqlDb.SetConnMaxLifetime(5 * time.Minute)
-	**/
-	// 应用服务
-	la.app = fiber.New(fiber.Config{
+	ac := &fiber.Config{
 		CaseSensitive: true,
 		StrictRouting: true,
 		AppName:       appConfig.AppTitle(),
-	})
+	}
 	// 应用可选配置
 	for _, opt := range opts {
-		opt(la)
+		opt(ac)
 	}
+	// 应用服务
+	la := &LegoApp{app: fiber.New(*ac), ctx: context.Background()}
 	// 注册关闭前钩子
 	la.app.Hooks().OnPreShutdown(func() error {
 		sugarLogger.Infoln("Server is shutting down...")
@@ -58,11 +44,10 @@ func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
 	return la
 }
 
-type LegoOption = func(cfg *LegoApp)
+type LegoOption = func(cfg *fiber.Config)
 
 func UseFiberService(service fiber.Service) LegoOption {
-	return func(la *LegoApp) {
-		cfg := la.app.Config()
+	return func(cfg *fiber.Config) {
 		cfg.Services = append(cfg.Services, service)
 	}
 }

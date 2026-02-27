@@ -1,13 +1,13 @@
-package handlers
+package system
 
 import (
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/dal"
-	"murphyl.com/lego/misc"
+	"murphyl.com/lego/cgi/support"
+	"murphyl.com/lego/udf"
 )
 
-var sugarLogger = misc.NewSugarLogger()
+var sugarLogger = udf.NewSugarLogger()
 
 type DictType struct {
 	DictCode string
@@ -25,7 +25,7 @@ type DictGroup struct {
 }
 
 func GetDictTypeHandler(c fiber.Ctx) error {
-	dao, _ := fiber.GetService[dal.DataAccessLayer](c.App().State(), "default")
+	dao := support.DefaultDataAccessLayer(c)
 	sugarLogger.Infoln("获取字典类型：", dao)
 	return c.JSON(fiber.Map{"code": "200", "data": []DictType{}})
 }

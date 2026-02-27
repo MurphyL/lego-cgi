@@ -1,8 +1,12 @@
-package misc
+package udf
 
 import (
 	"os"
 	"strings"
+)
+
+const (
+	DeafultKey = "default"
 )
 
 // LoadProperty 加载配置，参数优先级：CLI参数 > 环境变量 > 默认值
@@ -15,6 +19,6 @@ func LoadProperty(p *string, name string, defaultValue, usage string) {
 	}
 }
 
-func UniqueId(items ...string) string {
+func ObjectKey(items ...string) string {
 	return strings.Join(items, ":")
 }

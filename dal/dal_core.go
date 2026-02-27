@@ -7,15 +7,23 @@ import (
 	"gorm.io/gorm"
 
 	"murphyl.com/lego/dal/connectors"
-	"murphyl.com/lego/misc"
+	"murphyl.com/lego/udf"
 )
 
-var sugarLogger = misc.NewSugarLogger()
+const (
+	namespace = "dal"
+)
 
-func New(productKind string, dsn string) DataAccessLayer {
+var sugarLogger = udf.NewSugarLogger()
+
+func RefKey(objectKey string) string {
+	return udf.ObjectKey(namespace, objectKey)
+}
+
+func New(objectKey, productKind string, dsn string) DataAccessLayer {
 	switch productKind {
 	case "mysql", "sqlite":
-		repo := &GormRepo{ctx: context.Background()}
+		repo := &GormRepo{key: RefKey(objectKey)}
 		switch productKind {
 		case "mysql":
 			repo.gorm = connectors.OpenMySqlConnection(dsn)
@@ -36,22 +44,21 @@ type DataAccessLayer interface {
 type GormRepo struct {
 	ctx  context.Context
 	gorm gorm.Dialector
+	key  string
 }
 
-func (a GormRepo) Start(ctx context.Context) error {
+func (r GormRepo) Start(ctx context.Context) error {
 	return nil
 }
 
-func (a GormRepo) String() string {
-	sugarLogger.Info("DataAccessLayer Start:", a.ctx.Value("key"))
-	return "default"
+func (r GormRepo) String() string {
+	return r.key
 }
 
-func (a GormRepo) State(ctx context.Context) (string, error) {
+func (r GormRepo) State(ctx context.Context) (string, error) {
 	return "", nil
 }
 
-func (a GormRepo) Terminate(ctx context.Context) error {
-	sugarLogger.Info("DataAccessLayer Terminate")
+func (r GormRepo) Terminate(ctx context.Context) error {
 	return nil
 }

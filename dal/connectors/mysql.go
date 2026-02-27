@@ -7,10 +7,10 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"murphyl.com/lego/misc"
+	"murphyl.com/lego/udf"
 )
 
-var sugarLogger = misc.NewSugarLogger()
+var sugarLogger = udf.NewSugarLogger()
 
 // root:123456@tcp(localhost:3306)/tizi365?charset=utf8&parseTime=True&loc=Local
 type MySqlConn struct {
