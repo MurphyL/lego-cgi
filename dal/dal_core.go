@@ -1,12 +1,13 @@
 package dal
 
 import (
-	"context"
+	"fmt"
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 
 	"murphyl.com/lego/dal/connectors"
+	"murphyl.com/lego/dal/drivers"
 	"murphyl.com/lego/udf"
 )
 
@@ -22,15 +23,19 @@ func RefKey(objectKey string) string {
 
 func New(objectKey, productKind string, dsn string) DataAccessLayer {
 	switch productKind {
-	case "mysql", "sqlite":
-		repo := &GormRepo{key: RefKey(objectKey)}
+	case connectors.RdbmsMySql:
+		var conn gorm.Dialector
 		switch productKind {
-		case "mysql":
-			repo.gorm = connectors.OpenMySqlConnection(dsn)
+		case connectors.RdbmsMySql:
+			conn = connectors.OpenMySqlConnection(dsn)
 		default:
-			panic("不支持的数据库类型：" + productKind)
+			panic(fmt.Errorf("不支持的数据库类型：%v", productKind))
 		}
-		return repo
+		dao, err := gorm.Open(conn)
+		if err != nil {
+			panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
+		}
+		return drivers.NewGromRepo(RefKey(objectKey), *dao)
 	default:
 		panic("不支持的数据访问产品：" + productKind)
 	}
@@ -39,26 +44,7 @@ func New(objectKey, productKind string, dsn string) DataAccessLayer {
 
 type DataAccessLayer interface {
 	fiber.Service
-}
 
-type GormRepo struct {
-	ctx  context.Context
-	gorm gorm.Dialector
-	key  string
-}
-
-func (r GormRepo) Start(ctx context.Context) error {
-	return nil
-}
-
-func (r GormRepo) String() string {
-	return r.key
-}
-
-func (r GormRepo) State(ctx context.Context) (string, error) {
-	return "", nil
-}
-
-func (r GormRepo) Terminate(ctx context.Context) error {
-	return nil
+	RetrieveOne(dest interface{}, conds ...interface{}) error
+	RetrieveAll(dest interface{}, conds ...interface{}) error
 }

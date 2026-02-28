@@ -1,4 +1,4 @@
-package support
+package cgi
 
 import (
 	"github.com/gofiber/fiber/v3"

@@ -10,6 +10,10 @@ import (
 	"murphyl.com/lego/udf"
 )
 
+const (
+	RdbmsMySql = "mysql"
+)
+
 var sugarLogger = udf.NewSugarLogger()
 
 // root:123456@tcp(localhost:3306)/tizi365?charset=utf8&parseTime=True&loc=Local

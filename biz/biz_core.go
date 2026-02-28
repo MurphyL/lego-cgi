@@ -16,5 +16,5 @@ func UseIdentifyManager(router fiber.Router) {
 }
 
 func UseSystemDictManager(router fiber.Router) {
-	router.Get("/dict/items", system.GetDictTypeHandler)
+	router.Get("/dict/items", system.SearchDictTypeHandler)
 }
