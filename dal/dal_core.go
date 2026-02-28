@@ -6,28 +6,28 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 
-	"murphyl.com/lego/dal/connectors"
 	"murphyl.com/lego/dal/drivers"
-	"murphyl.com/lego/udf"
+	"murphyl.com/lego/udf/lego_kits"
+	"murphyl.com/lego/udf/sugar"
 )
 
 const (
 	namespace = "dal"
 )
 
-var sugarLogger = udf.NewSugarLogger()
+var sugarLogger = sugar.NewSugarLogger()
 
 func RefKey(objectKey string) string {
-	return udf.ObjectKey(namespace, objectKey)
+	return lego_kits.ObjectKey(namespace, objectKey)
 }
 
 func New(objectKey, productKind string, dsn string) DataAccessLayer {
 	switch productKind {
-	case connectors.RdbmsMySql:
+	case drivers.RdbmsMySql:
 		var conn gorm.Dialector
 		switch productKind {
-		case connectors.RdbmsMySql:
-			conn = connectors.OpenMySqlConnection(dsn)
+		case drivers.RdbmsMySql:
+			conn = drivers.NewMySqlConnection(dsn)
 		default:
 			panic(fmt.Errorf("不支持的数据库类型：%v", productKind))
 		}

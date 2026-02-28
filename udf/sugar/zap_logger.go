@@ -1,4 +1,4 @@
-package udf
+package sugar
 
 import (
 	"github.com/natefinch/lumberjack"

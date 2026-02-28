@@ -2,7 +2,7 @@ package tag
 
 import (
 	"murphyl.com/lego/dal"
-	"murphyl.com/lego/udf"
+	"murphyl.com/lego/udf/period"
 )
 
 // Type 标签类型
@@ -17,7 +17,7 @@ const (
 // Tag 标签定义
 type Tag struct {
 	dal.Model
-	udf.PeriodValid
+	period.PeriodValid
 	ID          uint64         `json:"id"`
 	Code        string         `json:"code"`
 	Name        string         `json:"name"`
@@ -26,7 +26,6 @@ type Tag struct {
 	Weight      int            `json:"weight"`
 	Status      dal.StatusEnum `json:"status"`
 }
-
 
 // IsValid 检查标签是否有效
 func (t *Tag) IsValid() bool {

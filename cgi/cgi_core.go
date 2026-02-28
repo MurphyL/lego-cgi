@@ -9,10 +9,10 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/udf"
+	"murphyl.com/lego/udf/sugar"
 )
 
-var sugarLogger = udf.NewSugarLogger()
+var sugarLogger = sugar.NewSugarLogger()
 
 type LegoApp struct {
 	app *fiber.App

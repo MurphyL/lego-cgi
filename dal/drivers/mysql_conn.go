@@ -1,4 +1,4 @@
-package connectors
+package drivers
 
 import (
 	"fmt"
@@ -7,14 +7,19 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"murphyl.com/lego/udf"
+	"murphyl.com/lego/udf/sugar"
 )
 
 const (
 	RdbmsMySql = "mysql"
 )
 
-var sugarLogger = udf.NewSugarLogger()
+var sugarLogger = sugar.NewSugarLogger()
+
+func NewMySqlConnection(dsn string) gorm.Dialector {
+	sugarLogger.Infoln("连接 MySQL 数据库")
+	return mysql.Open(dsn)
+}
 
 // root:123456@tcp(localhost:3306)/tizi365?charset=utf8&parseTime=True&loc=Local
 type MySqlConn struct {
@@ -23,11 +28,6 @@ type MySqlConn struct {
 	Protocol string
 	Address  string
 	Database string
-}
-
-func OpenMySqlConnection(dsn string) gorm.Dialector {
-	sugarLogger.Infoln("连接 MySQL 数据库")
-	return mysql.Open(dsn)
 }
 
 func (conn *MySqlConn) DatasourceName() string {

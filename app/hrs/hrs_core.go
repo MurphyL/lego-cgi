@@ -4,7 +4,7 @@ import (
 	"murphyl.com/lego/biz"
 	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/dal"
-	"murphyl.com/lego/udf"
+	"murphyl.com/lego/udf/lego_kits"
 )
 
 var (
@@ -22,7 +22,7 @@ type AppConfig struct {
 
 func main() {
 	cnf := loadConfig()
-	dao := dal.New(udf.DeafultKey, "mysql", cnf.dsn)
+	dao := dal.New(lego_kits.DeafultKey, "mysql", cnf.dsn)
 	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
 	app.Mount("/account", biz.UseIdentifyManager)
 	app.Mount("/system", biz.UseSystemDictManager)
@@ -31,9 +31,9 @@ func main() {
 
 func loadConfig() *AppConfig {
 	appConfig := &AppConfig{}
-	udf.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", AppTitle, "应用标题")
-	udf.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", BindAddr, "应用绑定地址")
-	udf.LoadProperty(&appConfig.dsn, "DATASOURCE_NAME", DataSourceName, "数据库连接地址")
+	lego_kits.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", AppTitle, "应用标题")
+	lego_kits.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", BindAddr, "应用绑定地址")
+	lego_kits.LoadProperty(&appConfig.dsn, "DATASOURCE_NAME", DataSourceName, "数据库连接地址")
 	return appConfig
 }
 
