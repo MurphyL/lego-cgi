@@ -2,7 +2,9 @@ go 1.25.0
 
 use (
 	./app/hrs
+	./biz
 	./cgi
 	./dal
+	./gui
 	./udf
 )

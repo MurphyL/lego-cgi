@@ -1,6 +1,7 @@
 package main
 
 import (
+	"murphyl.com/lego/biz"
 	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/dal"
 	"murphyl.com/lego/udf"
@@ -23,8 +24,8 @@ func main() {
 	cnf := loadConfig()
 	dao := dal.New(udf.DeafultKey, "mysql", cnf.dsn)
 	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
-	app.Mount("/account", cgi.UseIdentifyManager)
-	app.Mount("/system", cgi.UseSystemDictManager)
+	app.Mount("/account", biz.UseIdentifyManager)
+	app.Mount("/system", biz.UseSystemDictManager)
 	app.Serve(cnf.BindAddress())
 }
 

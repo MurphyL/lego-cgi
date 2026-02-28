@@ -17,7 +17,7 @@ const (
 // Tag 标签定义
 type Tag struct {
 	dal.Model
-	misc.PeriodValid
+	udf.PeriodValid
 	ID          uint64         `json:"id"`
 	Code        string         `json:"code"`
 	Name        string         `json:"name"`
@@ -27,18 +27,6 @@ type Tag struct {
 	Status      dal.StatusEnum `json:"status"`
 }
 
-func (t Type) Label() string {
-	switch t {
-	case TypeSystem:
-		return "系统标签"
-	case TypeManual:
-		return "手动标签"
-	case TypeRuleBased:
-		return "规则标签"
-	default:
-		return "其他标签"
-	}
-}
 
 // IsValid 检查标签是否有效
 func (t *Tag) IsValid() bool {

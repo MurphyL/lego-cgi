@@ -1,10 +1,9 @@
-package cgi
+package biz
 
 import (
 	"github.com/gofiber/fiber/v3"
-
-	"murphyl.com/lego/cgi/domain/iam"
-	"murphyl.com/lego/cgi/domain/system"
+	"murphyl.com/lego/biz/iam"
+	"murphyl.com/lego/biz/system"
 )
 
 // UseIdentifyManager 身份管理模块
