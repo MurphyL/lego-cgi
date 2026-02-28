@@ -2,6 +2,7 @@ package wework
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"testing"
 )
@@ -12,7 +13,7 @@ func TestNewChatGroupRobot(t *testing.T) {
 		t.Log("生产机器人出错")
 		return
 	}
-	req, err := sendMessage(context.Background(), "{}")
+	req, err := sendMessage(context.Background(), "{\"msgtype\": \"text\",\"text\": {\"content\": \"hello world\"}}")
 	if err != nil {
 		t.Log("构造请求报文出从")
 		return
@@ -23,5 +24,6 @@ func TestNewChatGroupRobot(t *testing.T) {
 		t.Log("发送请求出错")
 		return
 	}
-	t.Log("请求已发送：", resp)
+	data, _ := io.ReadAll(resp.Body)
+	t.Log("请求已发送：", string(data))
 }
