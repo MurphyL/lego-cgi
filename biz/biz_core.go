@@ -3,6 +3,7 @@ package biz
 import (
 	"github.com/gofiber/fiber/v3"
 	"murphyl.com/lego/biz/cate"
+	"murphyl.com/lego/biz/corp"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/system"
 	"murphyl.com/lego/biz/tag"
@@ -58,8 +59,24 @@ func UseTenantManager(router fiber.Router) {
 	router.Get("/tenants/:tenantId/members", iam.ListTenantMembersHandler)
 }
 
+// UseSystemDictManager 数据字典管理模块
 func UseSystemDictManager(router fiber.Router) {
-	router.Get("/dict/items", system.SearchDictTypeHandler)
+	// 字典类型管理
+	router.Post("/dict/types", system.CreateDictTypeHandler)
+	router.Put("/dict/types", system.UpdateDictTypeHandler)
+	router.Delete("/dict/types/:dictCode", system.DeleteDictTypeHandler)
+	router.Get("/dict/types/:dictCode", system.GetDictTypeHandler)
+	router.Get("/dict/types", system.ListDictTypesHandler)
+
+	// 字典项管理
+	router.Post("/dict/items", system.CreateDictItemHandler)
+	router.Put("/dict/items", system.UpdateDictItemHandler)
+	router.Delete("/dict/items/:id", system.DeleteDictItemHandler)
+	router.Get("/dict/items/:id", system.GetDictItemHandler)
+	router.Get("/dict/items", system.ListDictItemsHandler)
+
+	// 字典组管理
+	router.Get("/dict/groups/:dictCode", system.GetDictGroupHandler)
 }
 
 // UseTagManager 标签管理模块
@@ -79,4 +96,12 @@ func UseCategoryManager(router fiber.Router) {
 	router.Get("/categories/:id", cate.GetCategoryHandler)
 	router.Get("/categories", cate.ListCategoriesHandler)
 	router.Get("/categories/tree", cate.GetCategoryTreeHandler)
+}
+
+// UseCorpManager 企业管理模块
+func UseCorpManager(router fiber.Router) {
+	router.Post("/corps", corp.ListCorpsHandler)
+	router.Get("/corps/:id", corp.GetCorpByIdHandler)
+	router.Get("/corps/by-code", corp.GetCorpByUnifiedCodeHandler)
+	router.Post("/corps/verify", corp.VerifyCorpHandler)
 }
