@@ -2,8 +2,10 @@ package biz
 
 import (
 	"github.com/gofiber/fiber/v3"
+	"murphyl.com/lego/biz/cate"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/system"
+	"murphyl.com/lego/biz/tag"
 )
 
 // UseIdentifyManager 身份管理模块
@@ -58,4 +60,23 @@ func UseTenantManager(router fiber.Router) {
 
 func UseSystemDictManager(router fiber.Router) {
 	router.Get("/dict/items", system.SearchDictTypeHandler)
+}
+
+// UseTagManager 标签管理模块
+func UseTagManager(router fiber.Router) {
+	router.Post("/tags", tag.CreateTagHandler)
+	router.Put("/tags/:id", tag.UpdateTagHandler)
+	router.Delete("/tags/:id", tag.DeleteTagHandler)
+	router.Get("/tags/:id", tag.GetTagHandler)
+	router.Get("/tags", tag.ListTagsHandler)
+}
+
+// UseCategoryManager 分类管理模块
+func UseCategoryManager(router fiber.Router) {
+	router.Post("/categories", cate.CreateCategoryHandler)
+	router.Put("/categories/:id", cate.UpdateCategoryHandler)
+	router.Delete("/categories/:id", cate.DeleteCategoryHandler)
+	router.Get("/categories/:id", cate.GetCategoryHandler)
+	router.Get("/categories", cate.ListCategoriesHandler)
+	router.Get("/categories/tree", cate.GetCategoryTreeHandler)
 }
