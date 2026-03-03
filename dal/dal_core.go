@@ -38,7 +38,7 @@ func New(objectKey, productKind string, dsn string) DataAccessLayer {
 		if err != nil {
 			panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
 		}
-		return drivers.NewGromRepo(RefKey(objectKey), dao)
+		return drivers.NewGormRepo(RefKey(objectKey), dao)
 	default:
 		panic("不支持的数据访问产品：" + productKind)
 	}

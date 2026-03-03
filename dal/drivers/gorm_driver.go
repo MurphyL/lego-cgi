@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewGromRepo(key string, gorm *gorm.DB) *GormRepo {
+func NewGormRepo(key string, gorm *gorm.DB) *GormRepo {
 	return &GormRepo{key: key, gorm: gorm}
 }
 
