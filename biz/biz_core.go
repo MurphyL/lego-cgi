@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"murphyl.com/lego/biz/cate"
 	"murphyl.com/lego/biz/corp"
+	"murphyl.com/lego/biz/excel"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/system"
 	"murphyl.com/lego/biz/tag"
@@ -17,6 +18,7 @@ func UseIdentifyManager(router fiber.Router) {
 	router.Post("/login", iam.LoginHandler)
 	router.Post("/logout", iam.LogoutHandler)
 	router.Get("/profile", iam.GetUserProfileHandler)
+	router.Put("/profile", iam.UpdateProfileHandler)
 	router.Post("/reset-password", iam.ResetPasswordHandler)
 	router.Post("/captcha", iam.CaptchaHandler)
 }
@@ -107,4 +109,10 @@ func UseCorpManager(router fiber.Router) {
 	router.Get("/corps/:id", corp.GetCorpByIdHandler)
 	router.Get("/corps/by-code", corp.GetCorpByUnifiedCodeHandler)
 	router.Post("/corps/verify", corp.VerifyCorpHandler)
+}
+
+// UseExcelManager Excel导出模块
+func UseExcelManager(router fiber.Router) {
+	router.Post("/excel/export", excel.ExportExcelHandler)
+	router.Get("/excel/demo", excel.ExportDemoHandler)
 }

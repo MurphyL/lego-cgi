@@ -3,6 +3,7 @@ module murphyl.com/lego/biz
 go 1.25.0
 
 require (
+	github.com/xuri/excelize/v2 v2.8.0
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/gofiber/fiber/v3 v3.1.0 // indirect
 	github.com/gofiber/schema v1.7.0 // indirect

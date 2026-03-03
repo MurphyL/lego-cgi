@@ -47,6 +47,7 @@ func LoginHandler(c fiber.Ctx) error {
 		Username: req.Username,
 		Mobile:   "13800138000",
 		Email:    "admin@example.com",
+		Avatar:   "https://example.com/avatar.jpg", // 模拟头像URL
 	}
 
 	return c.Status(fiber.StatusOK).JSON(LoginResponse{
@@ -74,6 +75,7 @@ func GetUserProfileHandler(c fiber.Ctx) error {
 		Username: "admin",
 		Mobile:   "13800138000",
 		Email:    "admin@example.com",
+		Avatar:   "https://example.com/avatar.jpg", // 模拟头像URL
 	}
 
 	personInfo := PersonInfo{
@@ -138,6 +140,31 @@ func CaptchaHandler(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(CaptchaResponse{
 		Key:  key,
 		Data: data,
+	})
+}
+
+// UpdateProfileHandler 更新用户资料处理函数
+func UpdateProfileHandler(c fiber.Ctx) error {
+	var req UpdateProfileRequest
+	body := c.Body()
+	if err := json.Unmarshal(body, &req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	// 实际应用中应该从token中获取用户信息，然后更新数据库
+	// 这里只是模拟更新用户资料
+	user := Account{
+		ID:       1,
+		PersonID: 1,
+		Username: "admin",
+		Mobile:   req.Mobile,
+		Email:    req.Email,
+		Avatar:   req.Avatar,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(UpdateProfileResponse{
+		Success: true,
+		User:    user,
 	})
 }
 
