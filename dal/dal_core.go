@@ -56,4 +56,5 @@ type DataAccessLayer interface {
 	Count(dest interface{}, conds ...interface{}) (int64, error)
 	Page(dest interface{}, page, pageSize int, conds ...interface{}) error
 	Transaction(fn func(tx *gorm.DB) error) error
+	DB() *gorm.DB
 }

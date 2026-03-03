@@ -76,3 +76,8 @@ func (r GormRepo) Page(dest interface{}, page, pageSize int, conds ...interface{
 func (r GormRepo) Transaction(fn func(tx *gorm.DB) error) error {
 	return r.gorm.Transaction(fn)
 }
+
+// DB 获取数据库连接
+func (r GormRepo) DB() *gorm.DB {
+	return r.gorm
+}

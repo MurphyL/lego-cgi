@@ -63,6 +63,11 @@ func (la *LegoApp) Mount(url string, useRouterGroup func(router fiber.Router)) {
 	useRouterGroup(la.app.Group(path.Join("/api", url)))
 }
 
+// Group 创建路由组
+func (la *LegoApp) Group(prefix string, handlers ...any) fiber.Router {
+	return la.app.Group(prefix, handlers...)
+}
+
 func (la *LegoApp) Serve(addr string) {
 	// 启动服务器协程
 	go func() {

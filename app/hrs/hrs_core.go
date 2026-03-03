@@ -1,6 +1,9 @@
 package main
 
 import (
+	"murphyl.com/app/hrs/handlers/analytics"
+	"murphyl.com/app/hrs/handlers/property"
+	"murphyl.com/app/hrs/handlers/tenant"
 	"murphyl.com/lego/biz"
 	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/dal"
@@ -29,6 +32,21 @@ func main() {
 	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
 	app.Mount("/account", biz.UseIdentifyManager)
 	app.Mount("/system", biz.UseSystemDictManager)
+	app.Mount("/finance", biz.UseFinanceManager(dao.DB()))
+	app.Mount("/contract", biz.UseContractManager(dao.DB()))
+
+	// 挂载房源管理路由
+	propertyHandler := property.NewPropertyHandler(dao.DB())
+	propertyHandler.RegisterRoutes(app.Group("/api"))
+
+	// 挂载租户管理路由
+	tenantHandler := tenant.NewTenantHandler(dao.DB())
+	tenantHandler.RegisterRoutes(app.Group("/api"))
+
+	// 挂载数据分析路由
+	analyticsHandler := analytics.NewAnalyticsHandler(dao.DB())
+	analyticsHandler.RegisterRoutes(app.Group("/api"))
+
 	app.Serve(cnf.BindAddress())
 }
 
