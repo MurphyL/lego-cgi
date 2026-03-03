@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 
 	"murphyl.com/lego/dal/drivers"
-	"murphyl.com/lego/udf/lego_kits"
-	"murphyl.com/lego/udf/sugar"
+	"murphyl.com/lego/pkg/shared"
+	"murphyl.com/lego/pkg/sugar"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 var sugarLogger = sugar.NewSugarLogger()
 
 func RefKey(objectKey string) string {
-	return lego_kits.ObjectKey(namespace, objectKey)
+	return shared.ObjectKey(namespace, objectKey)
 }
 
 func New(objectKey, productKind string, dsn string) DataAccessLayer {

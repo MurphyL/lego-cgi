@@ -6,5 +6,5 @@ use (
 	./biz
 	./cgi
 	./dal
-	./udf
+	./pkg
 )

@@ -4,11 +4,11 @@ import (
 	"github.com/gofiber/fiber/v3"
 
 	"murphyl.com/lego/dal"
-	"murphyl.com/lego/udf/lego_kits"
+	"murphyl.com/lego/pkg/shared"
 )
 
 func DefaultDataAccessLayer(c fiber.Ctx) dal.DataAccessLayer {
-	return GetDataAccessLayer(c, lego_kits.DeafultKey)
+	return GetDataAccessLayer(c, shared.DeafultKey)
 }
 
 func GetDataAccessLayer(c fiber.Ctx, key string) dal.DataAccessLayer {

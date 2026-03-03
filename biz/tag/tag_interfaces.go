@@ -2,7 +2,7 @@ package tag
 
 import (
 	"murphyl.com/lego/dal"
-	"murphyl.com/lego/udf/period"
+	"murphyl.com/lego/pkg/period"
 )
 
 // Type 标签类型

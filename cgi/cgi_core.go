@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/udf/sugar"
+	"murphyl.com/lego/pkg/sugar"
 )
 
 var sugarLogger = sugar.NewSugarLogger()

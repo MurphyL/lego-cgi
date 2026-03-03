@@ -1,4 +1,4 @@
-module murphyl.com/lego/udf
+module murphyl.com/lego/pkg
 
 go 1.25.0
 

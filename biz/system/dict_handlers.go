@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v3"
 
 	"murphyl.com/lego/cgi"
-	"murphyl.com/lego/udf/requests"
-	"murphyl.com/lego/udf/sugar"
+	"murphyl.com/lego/pkg/requests"
+	"murphyl.com/lego/pkg/sugar"
 )
 
 var sugarLogger = sugar.NewSugarLogger()

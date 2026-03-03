@@ -1,4 +1,4 @@
-package lego_kits
+package shared
 
 import (
 	"os"

@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"murphyl.com/lego/udf/sugar"
+	"murphyl.com/lego/pkg/sugar"
 )
 
 const (
