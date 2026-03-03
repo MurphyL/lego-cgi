@@ -35,7 +35,7 @@ func New(objectKey, productKind string, dsn string) DataAccessLayer {
 		if err != nil {
 			panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
 		}
-		return drivers.NewGromRepo(RefKey(objectKey), *dao)
+		return drivers.NewGromRepo(RefKey(objectKey), dao)
 	default:
 		panic("不支持的数据访问产品：" + productKind)
 	}
@@ -47,4 +47,10 @@ type DataAccessLayer interface {
 
 	RetrieveOne(dest interface{}, conds ...interface{}) error
 	RetrieveAll(dest interface{}, conds ...interface{}) error
+	Create(dest interface{}) error
+	Update(dest interface{}, conds ...interface{}) error
+	Delete(dest interface{}, conds ...interface{}) error
+	Count(dest interface{}, conds ...interface{}) (int64, error)
+	Page(dest interface{}, page, pageSize int, conds ...interface{}) error
+	Transaction(fn func(tx *gorm.DB) error) error
 }
