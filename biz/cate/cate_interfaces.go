@@ -6,6 +6,9 @@ import (
 	"murphyl.com/lego/dal"
 )
 
+// cate 模块是分类管理模块，用于管理各种类型的分类
+// 主要功能包括：分类的创建、更新、删除、查询、树形结构展示等
+
 // Category 分类定义
 type Category struct {
 	ID          uint64         `json:"id"`

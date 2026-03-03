@@ -12,6 +12,9 @@ import (
 	"murphyl.com/lego/pkg/sugar"
 )
 
+// cgi 模块是CGI相关模块，提供了LegoApp结构体，用于创建和管理Fiber应用程序
+// 主要功能包括：创建应用、挂载路由、启动服务等
+
 var sugarLogger = sugar.NewSugarLogger()
 
 type LegoApp struct {

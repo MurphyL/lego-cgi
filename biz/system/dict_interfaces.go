@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+// system 模块是系统管理模块，包含数据字典管理等功能
+// 主要功能包括：字典类型管理、字典项管理、字典组管理等
+
 type DictType struct {
 	ID          uint64    `json:"id"`
 	DictCode    string    `json:"dictCode"`

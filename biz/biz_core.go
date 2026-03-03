@@ -9,6 +9,9 @@ import (
 	"murphyl.com/lego/biz/tag"
 )
 
+// biz 模块是通用业务模块，包含了各种业务逻辑的实现
+// 主要包括：身份管理、RBAC权限控制、租户管理、数据字典管理、标签管理、分类管理和企业管理
+
 // UseIdentifyManager 身份管理模块
 func UseIdentifyManager(router fiber.Router) {
 	router.Post("/login", iam.LoginHandler)

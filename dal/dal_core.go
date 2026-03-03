@@ -11,6 +11,9 @@ import (
 	"murphyl.com/lego/pkg/sugar"
 )
 
+// dal 模块是数据访问层模块，定义了DataAccessLayer接口，用于数据访问操作
+// 主要功能包括：数据的增删改查、分页查询、事务处理等
+
 const (
 	namespace = "dal"
 )

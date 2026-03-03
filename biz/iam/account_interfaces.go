@@ -1,5 +1,8 @@
 package iam
 
+// iam 模块是身份与访问管理模块，包含用户管理、RBAC权限控制、租户管理等功能
+// 主要功能包括：用户登录、登出、获取用户信息、重置密码、获取验证码等
+
 // PersonInfo 公民信息
 type PersonInfo struct {
 	Id         uint64 `json:"id"`

@@ -7,4 +7,5 @@ use (
 	./cgi
 	./dal
 	./pkg
+	./res
 )

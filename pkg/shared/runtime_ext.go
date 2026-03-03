@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// shared 包是共享工具包，提供了通用的工具函数
+// 主要功能包括：配置加载、对象键生成等
+
 const (
 	DeafultKey = "default"
 )

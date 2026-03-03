@@ -5,6 +5,9 @@ import (
 	"murphyl.com/lego/pkg/period"
 )
 
+// tag 模块是标签管理模块，用于管理各种类型的标签
+// 主要功能包括：标签的创建、更新、删除、查询等
+
 // Type 标签类型
 type Type uint8
 

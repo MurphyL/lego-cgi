@@ -7,6 +7,9 @@ import (
 	"murphyl.com/lego/pkg/shared"
 )
 
+// hrs 模块是人力资源系统模块，使用Fiber框架
+// 主要功能包括：身份管理、系统字典管理等
+
 var (
 	AppTitle       = "房源智管"
 	BindAddr       = ":4000"
