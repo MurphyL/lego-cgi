@@ -11,7 +11,76 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"murphyl.com/lego/biz/open"
 )
+
+// 初始化时注册机器人工厂
+func init() {
+	open.RegisterChatBotFactory(open.BotTypeDingtalk, &dingtalkChatBotFactory{})
+}
+
+// dingtalkChatBotFactory 钉钉机器人工厂
+type dingtalkChatBotFactory struct{}
+
+// CreateBot 创建钉钉机器人
+func (f *dingtalkChatBotFactory) CreateBot(config open.BotConfig) (open.ChatBot, error) {
+	bot, err := NewChatBot(config.AccessToken, config.Secret)
+	if err != nil {
+		return nil, err
+	}
+	return &dingtalkChatBotAdapter{bot: bot}, nil
+}
+
+// dingtalkChatBotAdapter 钉钉机器人适配器
+type dingtalkChatBotAdapter struct {
+	bot ChatBot
+}
+
+// CreateRequest 创建HTTP请求
+func (a *dingtalkChatBotAdapter) CreateRequest(ctx context.Context, data any) (*http.Request, error) {
+	return a.bot.CreateRequest(ctx, data)
+}
+
+// SendMessage 发送消息
+func (a *dingtalkChatBotAdapter) SendMessage(ctx context.Context, message open.Message) error {
+	return a.bot.SendMessage(ctx, message)
+}
+
+// SendText 发送文本消息
+func (a *dingtalkChatBotAdapter) SendText(ctx context.Context, content string, options map[string]interface{}) error {
+	return a.bot.SendText(ctx, content, options)
+}
+
+// SendMarkdown 发送Markdown消息
+func (a *dingtalkChatBotAdapter) SendMarkdown(ctx context.Context, content string, options map[string]interface{}) error {
+	return a.bot.SendMarkdown(ctx, content, options)
+}
+
+// SendImage 发送图片消息
+func (a *dingtalkChatBotAdapter) SendImage(ctx context.Context, imageData map[string]string) error {
+	return a.bot.SendImage(ctx, imageData)
+}
+
+// SendNews 发送图文消息
+func (a *dingtalkChatBotAdapter) SendNews(ctx context.Context, articles []map[string]string) error {
+	return a.bot.SendNews(ctx, articles)
+}
+
+// SendLink 发送链接消息
+func (a *dingtalkChatBotAdapter) SendLink(ctx context.Context, linkData map[string]string) error {
+	return a.bot.SendLink(ctx, linkData)
+}
+
+// SendActionCard 发送行动卡片消息
+func (a *dingtalkChatBotAdapter) SendActionCard(ctx context.Context, cardData map[string]interface{}) error {
+	return a.bot.SendActionCard(ctx, cardData)
+}
+
+// SendFeedCard 发送Feed卡片消息
+func (a *dingtalkChatBotAdapter) SendFeedCard(ctx context.Context, links []map[string]string) error {
+	return a.bot.SendFeedCard(ctx, links)
+}
 
 // https://oapi.dingtalk.com/robot/send?access_token=ACCESS_TOKEN
 
@@ -92,20 +161,24 @@ type Message struct {
 	FeedCard   *FeedCardMessage   `json:"feedCard,omitempty"`   // Feed卡片消息
 }
 
-// ChatGroupRobot 群机器人接口
-type ChatGroupRobot interface {
+// ChatBot 群机器人接口
+type ChatBot interface {
 	// CreateRequest 创建HTTP请求
 	CreateRequest(ctx context.Context, data any) (*http.Request, error)
 	// SendMessage 发送消息
-	SendMessage(ctx context.Context, message Message) error
+	SendMessage(ctx context.Context, message interface{}) error
 	// SendText 发送文本消息
-	SendText(ctx context.Context, content string, atMobiles []string, atUserIds []string, isAtAll bool) error
+	SendText(ctx context.Context, content string, options map[string]interface{}) error
 	// SendMarkdown 发送Markdown消息
-	SendMarkdown(ctx context.Context, title string, content string, atMobiles []string, atUserIds []string, isAtAll bool) error
+	SendMarkdown(ctx context.Context, content string, options map[string]interface{}) error
+	// SendImage 发送图片消息
+	SendImage(ctx context.Context, imageData map[string]string) error
+	// SendNews 发送图文消息
+	SendNews(ctx context.Context, articles []map[string]string) error
 	// SendLink 发送链接消息
-	SendLink(ctx context.Context, title string, text string, messageURL string, picURL string) error
+	SendLink(ctx context.Context, linkData map[string]string) error
 	// SendActionCard 发送行动卡片消息
-	SendActionCard(ctx context.Context, title string, text string, btnOrientation string, btns []map[string]string) error
+	SendActionCard(ctx context.Context, cardData map[string]interface{}) error
 	// SendFeedCard 发送Feed卡片消息
 	SendFeedCard(ctx context.Context, links []map[string]string) error
 }
@@ -117,8 +190,8 @@ type chatGroupRobot struct {
 	maxRetries int
 }
 
-// NewChatGroupRobot 创建群机器人
-func NewChatGroupRobot(accessToken string, secret string) (ChatGroupRobot, error) {
+// NewChatBot 创建群机器人
+func NewChatBot(accessToken string, secret string) (ChatBot, error) {
 	robotWebhook, err := url.Parse(DingtalkChatGroupRobotWebhook)
 	if err != nil {
 		return nil, fmt.Errorf("解析URL出错：%v", err.Error())
@@ -187,7 +260,7 @@ func (r *chatGroupRobot) CreateRequest(ctx context.Context, data any) (*http.Req
 }
 
 // SendMessage 发送消息
-func (r *chatGroupRobot) SendMessage(ctx context.Context, message Message) error {
+func (r *chatGroupRobot) SendMessage(ctx context.Context, message interface{}) error {
 	var err error
 	for i := 0; i < r.maxRetries; i++ {
 		req, err := r.CreateRequest(ctx, message)
@@ -226,7 +299,25 @@ func (r *chatGroupRobot) SendMessage(ctx context.Context, message Message) error
 }
 
 // SendText 发送文本消息
-func (r *chatGroupRobot) SendText(ctx context.Context, content string, atMobiles []string, atUserIds []string, isAtAll bool) error {
+func (r *chatGroupRobot) SendText(ctx context.Context, content string, options map[string]interface{}) error {
+	var atMobiles []string
+	var atUserIds []string
+	var isAtAll bool
+
+	if opts, ok := options["at"]; ok {
+		if atOpts, ok := opts.(map[string]interface{}); ok {
+			if list, ok := atOpts["atMobiles"].([]string); ok {
+				atMobiles = list
+			}
+			if userIds, ok := atOpts["atUserIds"].([]string); ok {
+				atUserIds = userIds
+			}
+			if atAll, ok := atOpts["isAtAll"].(bool); ok {
+				isAtAll = atAll
+			}
+		}
+	}
+
 	message := Message{
 		MsgType: MessageTypeText,
 		Text: &TextMessage{
@@ -242,7 +333,30 @@ func (r *chatGroupRobot) SendText(ctx context.Context, content string, atMobiles
 }
 
 // SendMarkdown 发送Markdown消息
-func (r *chatGroupRobot) SendMarkdown(ctx context.Context, title string, content string, atMobiles []string, atUserIds []string, isAtAll bool) error {
+func (r *chatGroupRobot) SendMarkdown(ctx context.Context, content string, options map[string]interface{}) error {
+	var title string
+	var atMobiles []string
+	var atUserIds []string
+	var isAtAll bool
+
+	if t, ok := options["title"].(string); ok {
+		title = t
+	}
+
+	if opts, ok := options["at"]; ok {
+		if atOpts, ok := opts.(map[string]interface{}); ok {
+			if list, ok := atOpts["atMobiles"].([]string); ok {
+				atMobiles = list
+			}
+			if userIds, ok := atOpts["atUserIds"].([]string); ok {
+				atUserIds = userIds
+			}
+			if atAll, ok := atOpts["isAtAll"].(bool); ok {
+				isAtAll = atAll
+			}
+		}
+	}
+
 	message := Message{
 		MsgType: MessageTypeMarkdown,
 		Markdown: &MarkdownMessage{
@@ -258,15 +372,32 @@ func (r *chatGroupRobot) SendMarkdown(ctx context.Context, title string, content
 	return r.SendMessage(ctx, message)
 }
 
+// SendImage 发送图片消息
+func (r *chatGroupRobot) SendImage(ctx context.Context, imageData map[string]string) error {
+	// 钉钉机器人需要先上传图片获取media_id，这里简化处理
+	return nil
+}
+
+// SendNews 发送图文消息
+func (r *chatGroupRobot) SendNews(ctx context.Context, articles []map[string]string) error {
+	// 钉钉没有直接的图文消息类型，使用链接消息或Feed卡片消息代替
+	if len(articles) == 1 {
+		article := articles[0]
+		return r.SendLink(ctx, article)
+	} else {
+		return r.SendFeedCard(ctx, articles)
+	}
+}
+
 // SendLink 发送链接消息
-func (r *chatGroupRobot) SendLink(ctx context.Context, title string, text string, messageURL string, picURL string) error {
+func (r *chatGroupRobot) SendLink(ctx context.Context, linkData map[string]string) error {
 	message := Message{
 		MsgType: MessageTypeLink,
 		Link: &LinkMessage{
-			Title:      title,
-			Text:       text,
-			MessageURL: messageURL,
-			PicURL:     picURL,
+			Title:      linkData["title"],
+			Text:       linkData["text"],
+			MessageURL: linkData["messageUrl"],
+			PicURL:     linkData["picUrl"],
 		},
 	}
 
@@ -274,7 +405,28 @@ func (r *chatGroupRobot) SendLink(ctx context.Context, title string, text string
 }
 
 // SendActionCard 发送行动卡片消息
-func (r *chatGroupRobot) SendActionCard(ctx context.Context, title string, text string, btnOrientation string, btns []map[string]string) error {
+func (r *chatGroupRobot) SendActionCard(ctx context.Context, cardData map[string]interface{}) error {
+	var title string
+	var text string
+	var btnOrientation string
+	var btns []map[string]string
+
+	if t, ok := cardData["title"].(string); ok {
+		title = t
+	}
+
+	if t, ok := cardData["text"].(string); ok {
+		text = t
+	}
+
+	if orientation, ok := cardData["btnOrientation"].(string); ok {
+		btnOrientation = orientation
+	}
+
+	if buttons, ok := cardData["btns"].([]map[string]string); ok {
+		btns = buttons
+	}
+
 	actionCard := &ActionCardMessage{
 		Title:          title,
 		Text:           text,
@@ -310,8 +462,8 @@ func (r *chatGroupRobot) SendFeedCard(ctx context.Context, links []map[string]st
 
 	for i, link := range links {
 		feedCard.Links[i].Title = link["title"]
-		feedCard.Links[i].MessageURL = link["messageURL"]
-		feedCard.Links[i].PicURL = link["picURL"]
+		feedCard.Links[i].MessageURL = link["messageUrl"]
+		feedCard.Links[i].PicURL = link["picUrl"]
 	}
 
 	message := Message{
