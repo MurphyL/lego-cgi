@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/dal"
 	"murphyl.com/lego/pkg/sugar"
 )
 
@@ -31,7 +30,6 @@ type AppContext interface {
 
 type AppHandler interface {
 	RegisterRoutes(router fiber.Router)
-	GetDataAccessLayer(ctx fiber.Ctx) dal.DataAccessLayer
 }
 
 func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {

@@ -6,8 +6,6 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 	"murphyl.com/app/hrs/middleware"
-	"murphyl.com/lego/cgi"
-	"murphyl.com/lego/dal"
 )
 
 /**
@@ -175,11 +173,6 @@ type ContractHandler struct {
 // NewContractHandler 创建合同处理器
 func NewContractHandler() *ContractHandler {
 	return &ContractHandler{}
-}
-
-// GetDataAccessLayer 获取数据访问层
-func (h *ContractHandler) GetDataAccessLayer(ctx fiber.Ctx) dal.DataAccessLayer {
-	return cgi.DefaultDataAccessLayer(ctx)
 }
 
 // RegisterRoutes 注册路由

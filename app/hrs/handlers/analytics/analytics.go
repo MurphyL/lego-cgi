@@ -18,8 +18,11 @@ type AnalyticsHandler struct {
 }
 
 // NewAnalyticsHandler 创建数据分析处理器
-func NewAnalyticsHandler(db *gorm.DB) *AnalyticsHandler {
-	return &AnalyticsHandler{db: db}
+func NewAnalyticsHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &AnalyticsHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
 }
 
 // RegisterRoutes 注册路由

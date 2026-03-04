@@ -162,8 +162,11 @@ type PropertyHandler struct {
 }
 
 // NewPropertyHandler 创建房源处理器
-func NewPropertyHandler(db *gorm.DB) *PropertyHandler {
-	return &PropertyHandler{db: db}
+func NewPropertyHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &PropertyHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
 }
 
 // RegisterRoutes 注册路由

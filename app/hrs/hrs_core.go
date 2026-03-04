@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gorm.io/driver/mysql"
 	"murphyl.com/app/hrs/handlers/analytics"
 	"murphyl.com/app/hrs/handlers/property"
 	"murphyl.com/app/hrs/handlers/tenant"
@@ -29,25 +30,19 @@ type AppConfig struct {
 
 func main() {
 	cnf := loadConfig()
-	dao := dal.New(shared.DeafultKey, "mysql", cnf.dsn)
-	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
-	app.Mount("/account", biz.UseIdentifyManager)
-	app.Mount("/system", biz.UseSystemDictManager)
-	app.Mount("/finance", biz.UseFinanceManager)
-	app.Mount("/contract", biz.UseContractManager)
-
-	// 挂载房源管理路由
-	propertyHandler := property.NewPropertyHandler(dao.DB())
-	propertyHandler.RegisterRoutes(app.Group("/api"))
-
+	dao := dal.New(mysql.Open, cnf.dsn)
+	app := cgi.NewLegoApp(cnf)
+	app.Mount("/account", biz.NewIdentifyManager(dao))
+	app.Mount("/system", biz.NewSystemDictManager(dao))
+	app.Mount("/finance", biz.NewFinanceManager(dao))
+	app.Mount("/contract", biz.NewContractManager(dao))
 	// 挂载租户管理路由
-	tenantHandler := tenant.NewTenantHandler(dao.DB())
-	tenantHandler.RegisterRoutes(app.Group("/api"))
-
+	app.Mount("/tenant", tenant.NewTenantHandler(dao))
+	// 挂载房源管理路由
+	app.Mount("/hrs", property.NewPropertyHandler(dao))
 	// 挂载数据分析路由
-	analyticsHandler := analytics.NewAnalyticsHandler(dao.DB())
-	analyticsHandler.RegisterRoutes(app.Group("/api"))
-
+	app.Mount("/hrs/rpt", analytics.NewAnalyticsHandler(dao))
+	// 运行服务
 	app.Serve(cnf.BindAddress())
 }
 

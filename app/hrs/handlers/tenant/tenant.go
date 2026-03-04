@@ -155,8 +155,11 @@ type TenantHandler struct {
 }
 
 // NewTenantHandler 创建租户处理器
-func NewTenantHandler(db *gorm.DB) *TenantHandler {
-	return &TenantHandler{db: db}
+func NewTenantHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &TenantHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
 }
 
 // RegisterRoutes 注册路由

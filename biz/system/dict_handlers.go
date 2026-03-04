@@ -5,16 +5,32 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
+	"gorm.io/gorm"
 
-	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/pkg/requests"
 	"murphyl.com/lego/pkg/sugar"
 )
 
 var sugarLogger = sugar.NewSugarLogger()
 
+type DictHandler struct {
+	db *gorm.DB
+}
+
+func NewDictHandler(db *gorm.DB) *DictHandler {
+	return &DictHandler{db: db}
+}
+
+func (h *DictHandler) RegisterRoutes(router fiber.Router) {
+	router.Post("/dict/types", h.CreateDictTypeHandler)
+	router.Put("/dict/types/:dictCode", h.UpdateDictTypeHandler)
+	router.Delete("/dict/types/:dictCode", h.DeleteDictTypeHandler)
+	router.Get("/dict/types/:dictCode", h.GetDictTypeHandler)
+	router.Get("/dict/types", h.ListDictTypesHandler)
+}
+
 // CreateDictTypeHandler 创建字典类型
-func CreateDictTypeHandler(c fiber.Ctx) error {
+func (h *DictHandler) CreateDictTypeHandler(c fiber.Ctx) error {
 	var req DictTypeRequest
 	body := c.Body()
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -40,7 +56,7 @@ func CreateDictTypeHandler(c fiber.Ctx) error {
 }
 
 // UpdateDictTypeHandler 更新字典类型
-func UpdateDictTypeHandler(c fiber.Ctx) error {
+func (h *DictHandler) UpdateDictTypeHandler(c fiber.Ctx) error {
 	var req DictTypeRequest
 	body := c.Body()
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -66,7 +82,7 @@ func UpdateDictTypeHandler(c fiber.Ctx) error {
 }
 
 // DeleteDictTypeHandler 删除字典类型
-func DeleteDictTypeHandler(c fiber.Ctx) error {
+func (h *DictHandler) DeleteDictTypeHandler(c fiber.Ctx) error {
 	// dictCode := c.Params("dictCode")
 
 	// 实际应用中应该调用服务层删除字典类型
@@ -79,7 +95,7 @@ func DeleteDictTypeHandler(c fiber.Ctx) error {
 }
 
 // GetDictTypeHandler 获取字典类型
-func GetDictTypeHandler(c fiber.Ctx) error {
+func (h *DictHandler) GetDictTypeHandler(c fiber.Ctx) error {
 	dictCode := c.Params("dictCode")
 
 	// 实际应用中应该调用服务层获取字典类型
@@ -101,10 +117,9 @@ func GetDictTypeHandler(c fiber.Ctx) error {
 }
 
 // ListDictTypesHandler 列出字典类型
-func ListDictTypesHandler(c fiber.Ctx) error {
-	dao := cgi.DefaultDataAccessLayer(c)
+func (h *DictHandler) ListDictTypesHandler(c fiber.Ctx) error {
 	records := make([]DictType, 0)
-	if err := dao.RetrieveAll(&records); err == nil {
+	if err := h.db.Find(&records).Error; err == nil {
 		return c.JSON(requests.NewSuccessResult(records))
 	} else {
 		sugarLogger.Error("查询数据字典类型列表出错：", err.Error())
