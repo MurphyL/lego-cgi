@@ -1,14 +1,13 @@
 package biz
 
 import (
-	contract "command-line-argumentsE:\\Github\\lego-cgi\\app\\biz\\contract\\handlers\\contract.go"
-	finance "command-line-argumentsE:\\Github\\lego-cgi\\app\\biz\\finance\\handlers\\finance.go"
 	"github.com/gofiber/fiber/v3"
-	"gorm.io/gorm"
 
 	"murphyl.com/lego/biz/cate"
+	"murphyl.com/lego/biz/contract"
 	"murphyl.com/lego/biz/corp"
 	"murphyl.com/lego/biz/excel"
+	"murphyl.com/lego/biz/finance"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/system"
 	"murphyl.com/lego/biz/tag"
@@ -122,31 +121,15 @@ func UseExcelManager(router fiber.Router) {
 }
 
 // UseFinanceManager 财务管理模块
-func UseFinanceManager(db interface{}) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		// 将interface{}类型转换为*gorm.DB类型
-		gormDB, ok := db.(*gorm.DB)
-		if !ok {
-			return
-		}
-
-		// 创建财务管理处理器并注册路由
-		financeHandler := finance.NewFinanceHandler(gormDB)
-		financeHandler.RegisterRoutes(router)
-	}
+func UseFinanceManager(router fiber.Router) {
+	// 创建财务管理处理器并注册路由
+	financeHandler := finance.NewFinanceHandler()
+	financeHandler.RegisterRoutes(router)
 }
 
 // UseContractManager 合同管理模块
-func UseContractManager(db interface{}) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		// 将interface{}类型转换为*gorm.DB类型
-		gormDB, ok := db.(*gorm.DB)
-		if !ok {
-			return
-		}
-
-		// 创建合同管理处理器并注册路由
-		contractHandler := contract.NewContractHandler(gormDB)
-		contractHandler.RegisterRoutes(router)
-	}
+func UseContractManager(router fiber.Router) {
+	// 创建合同管理处理器并注册路由
+	contractHandler := contract.NewContractHandler()
+	contractHandler.RegisterRoutes(router)
 }

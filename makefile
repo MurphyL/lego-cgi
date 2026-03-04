@@ -12,5 +12,15 @@ hrs/build:
 rpt/build:
 	go build -ldflags "-w -s -X 'main.AppTitle=v1.2.3'" ./app/rpt
 
+mysql/run:
+	docker run \
+		--name mysql-lego -d \
+		-p 3306:3306 \
+		--restart unless-stopped \
+		-v $(res)/res/mysql/log:/var/log/mysql \
+		-v $(res)/res/mysql/data:/var/lib/mysql \
+		-e MYSQL_ROOT_PASSWORD=123456 \
+		mysql
+
 commit_id:
 	@echo $(shell git rev-parse HEAD)

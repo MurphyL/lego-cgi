@@ -4,6 +4,7 @@ import (
 	"murphyl.com/app/hrs/handlers/analytics"
 	"murphyl.com/app/hrs/handlers/property"
 	"murphyl.com/app/hrs/handlers/tenant"
+
 	"murphyl.com/lego/biz"
 	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/dal"
@@ -32,8 +33,8 @@ func main() {
 	app := cgi.NewLegoApp(cnf, cgi.UseFiberService(dao))
 	app.Mount("/account", biz.UseIdentifyManager)
 	app.Mount("/system", biz.UseSystemDictManager)
-	app.Mount("/finance", biz.UseFinanceManager(dao.DB()))
-	app.Mount("/contract", biz.UseContractManager(dao.DB()))
+	app.Mount("/finance", biz.UseFinanceManager)
+	app.Mount("/contract", biz.UseContractManager)
 
 	// 挂载房源管理路由
 	propertyHandler := property.NewPropertyHandler(dao.DB())

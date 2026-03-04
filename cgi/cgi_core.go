@@ -5,10 +5,12 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
 
+	"murphyl.com/lego/dal"
 	"murphyl.com/lego/pkg/sugar"
 )
 
@@ -25,6 +27,11 @@ type LegoApp struct {
 type AppContext interface {
 	AppTitle() string
 	BindAddress() string
+}
+
+type AppHandler interface {
+	RegisterRoutes(router fiber.Router)
+	GetDataAccessLayer(ctx fiber.Ctx) dal.DataAccessLayer
 }
 
 func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
@@ -78,7 +85,7 @@ func (la *LegoApp) Serve(addr string) {
 	sugarLogger.Info("Server started:", addr)
 	// 监听中断信号并触发优雅关闭
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
 	// 创建带超时的上下文，限制最长等待30秒
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

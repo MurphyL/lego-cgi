@@ -5,7 +5,9 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/lego/app/hrs/middleware"
+	"murphyl.com/app/hrs/middleware"
+	"murphyl.com/lego/cgi"
+	"murphyl.com/lego/dal"
 )
 
 /**
@@ -136,8 +138,13 @@ type FinanceHandler struct {
 }
 
 // NewFinanceHandler 创建财务管理处理器
-func NewFinanceHandler(db *gorm.DB) *FinanceHandler {
-	return &FinanceHandler{db: db}
+func NewFinanceHandler() *FinanceHandler {
+	return &FinanceHandler{}
+}
+
+// GetDataAccessLayer 获取数据访问层
+func (h *FinanceHandler) GetDataAccessLayer(ctx fiber.Ctx) dal.DataAccessLayer {
+	return cgi.DefaultDataAccessLayer(ctx)
 }
 
 // RegisterRoutes 注册路由
