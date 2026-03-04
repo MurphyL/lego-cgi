@@ -5,10 +5,7 @@ import (
 	"gorm.io/gorm"
 
 	"murphyl.com/lego/biz/cate"
-	"murphyl.com/lego/biz/contract"
 	"murphyl.com/lego/biz/corp"
-	"murphyl.com/lego/biz/excel"
-	"murphyl.com/lego/biz/finance"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/system"
 	"murphyl.com/lego/biz/tag"
@@ -126,31 +123,5 @@ func UseCorpManager(dao *gorm.DB) func(router fiber.Router) {
 		router.Get("/corps/:id", corp.GetCorpByIdHandler)
 		router.Get("/corps/by-code", corp.GetCorpByUnifiedCodeHandler)
 		router.Post("/corps/verify", corp.VerifyCorpHandler)
-	}
-}
-
-// UseExcelManager Excel导出模块
-func UseExcelManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		router.Post("/excel/export", excel.ExportExcelHandler)
-		router.Get("/excel/demo", excel.ExportDemoHandler)
-	}
-}
-
-// NewFinanceManager 财务管理模块
-func NewFinanceManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		// 创建财务管理处理器并注册路由
-		financeHandler := finance.NewFinanceHandler()
-		financeHandler.RegisterRoutes(router)
-	}
-}
-
-// NewContractManager 合同管理模块
-func NewContractManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		// 创建合同管理处理器并注册路由
-		contractHandler := contract.NewContractHandler()
-		contractHandler.RegisterRoutes(router)
 	}
 }

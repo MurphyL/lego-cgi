@@ -136,8 +136,11 @@ type FinanceHandler struct {
 }
 
 // NewFinanceHandler 创建财务管理处理器
-func NewFinanceHandler() *FinanceHandler {
-	return &FinanceHandler{}
+func NewFinanceHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &FinanceHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
 }
 
 // RegisterRoutes 注册路由

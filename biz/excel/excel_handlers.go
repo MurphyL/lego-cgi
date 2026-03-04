@@ -7,7 +7,14 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/xuri/excelize/v2"
+	"gorm.io/gorm"
 )
+
+func NewExcelHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		router.Post("/export", ExportExcelHandler)
+	}
+}
 
 // ExportExcelHandler 导出Excel文件
 func ExportExcelHandler(c fiber.Ctx) error {

@@ -171,8 +171,11 @@ type ContractHandler struct {
 }
 
 // NewContractHandler 创建合同处理器
-func NewContractHandler() *ContractHandler {
-	return &ContractHandler{}
+func NewContractHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &ContractHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
 }
 
 // RegisterRoutes 注册路由
