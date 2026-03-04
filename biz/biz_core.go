@@ -7,24 +7,11 @@ import (
 	"murphyl.com/lego/biz/cate"
 	"murphyl.com/lego/biz/corp"
 	"murphyl.com/lego/biz/iam"
-	"murphyl.com/lego/biz/system"
 	"murphyl.com/lego/biz/tag"
 )
 
 // biz 模块是通用业务模块，包含了各种业务逻辑的实现
 // 主要包括：身份管理、RBAC权限控制、租户管理、数据字典管理、标签管理、分类管理和企业管理
-
-// NewIdentifyManager 身份管理模块
-func NewIdentifyManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		router.Post("/login", iam.LoginHandler)
-		router.Post("/logout", iam.LogoutHandler)
-		router.Get("/profile", iam.GetUserProfileHandler)
-		router.Put("/profile", iam.UpdateProfileHandler)
-		router.Post("/reset-password", iam.ResetPasswordHandler)
-		router.Post("/captcha", iam.CaptchaHandler)
-	}
-}
 
 // UseRBACManager RBAC管理模块
 func UseRBACManager(dao *gorm.DB) func(router fiber.Router) {
@@ -68,28 +55,6 @@ func UseTenantManager(dao *gorm.DB) func(router fiber.Router) {
 		router.Put("/tenant-members/:id", iam.UpdateTenantMemberHandler)
 		router.Delete("/tenant-members", iam.RemoveTenantMemberHandler)
 		router.Get("/tenants/:tenantId/members", iam.ListTenantMembersHandler)
-	}
-}
-
-// NewSystemDictManager 数据字典管理模块
-func NewSystemDictManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		// 字典类型管理
-		// router.Post("/dict/types", system.CreateDictTypeHandler)
-		// router.Put("/dict/types", system.UpdateDictTypeHandler)
-		// router.Delete("/dict/types/:dictCode", system.DeleteDictTypeHandler)
-		// router.Get("/dict/types/:dictCode", system.GetDictTypeHandler)
-		// router.Get("/dict/types", system.ListDictTypesHandler)
-
-		// 字典项管理
-		router.Post("/dict/items", system.CreateDictItemHandler)
-		router.Put("/dict/items", system.UpdateDictItemHandler)
-		router.Delete("/dict/items/:id", system.DeleteDictItemHandler)
-		router.Get("/dict/items/:id", system.GetDictItemHandler)
-		router.Get("/dict/items", system.ListDictItemsHandler)
-
-		// 字典组管理
-		router.Get("/dict/groups/:dictCode", system.GetDictGroupHandler)
 	}
 }
 

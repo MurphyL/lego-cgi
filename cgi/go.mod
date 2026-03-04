@@ -5,12 +5,12 @@ go 1.25.0
 require (
 	github.com/gofiber/fiber/v3 v3.1.0
 	murphyl.com/lego/dal v0.0.0
-	murphyl.com/lego/pkg v0.0.0
+	murphyl.com/lego/fns v0.0.0
 )
 
 replace (
 	murphyl.com/lego/dal => ../dal
-	murphyl.com/lego/pkg => ../pkg
+	murphyl.com/lego/fns => ../fns
 )
 
 require (

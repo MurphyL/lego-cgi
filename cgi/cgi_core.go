@@ -10,7 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/pkg/sugar"
+	"murphyl.com/lego/fns/sugar"
 )
 
 // cgi 模块是CGI相关模块，提供了LegoApp结构体，用于创建和管理Fiber应用程序
@@ -20,12 +20,10 @@ var sugarLogger = sugar.NewSugarLogger()
 
 type LegoApp struct {
 	app *fiber.App
-	ctx context.Context
 }
 
 type AppContext interface {
 	AppTitle() string
-	BindAddress() string
 }
 
 type AppHandler interface {
@@ -43,7 +41,7 @@ func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
 		opt(ac)
 	}
 	// 应用服务
-	la := &LegoApp{app: fiber.New(*ac), ctx: context.Background()}
+	la := &LegoApp{app: fiber.New(*ac)}
 	// 注册关闭前钩子
 	la.app.Hooks().OnPreShutdown(func() error {
 		sugarLogger.Infoln("Server is shutting down...")

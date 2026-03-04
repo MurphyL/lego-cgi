@@ -2,7 +2,6 @@ package shared
 
 import (
 	"os"
-	"strings"
 )
 
 // shared 包是共享工具包，提供了通用的工具函数
@@ -20,8 +19,4 @@ func LoadProperty(p *string, name string, defaultValue, usage string) {
 	} else {
 		*p = value
 	}
-}
-
-func ObjectKey(items ...string) string {
-	return strings.Join(items, ":")
 }

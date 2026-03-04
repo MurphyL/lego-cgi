@@ -2,6 +2,8 @@ package dal
 
 import (
 	"time"
+
+	"murphyl.com/lego/fns/shared"
 )
 
 // StatusEnum 状态码
@@ -13,11 +15,11 @@ const (
 	StatusDeleted  StatusEnum = 2 // 逻辑删除
 )
 
-type Model struct {
-	Id        uint64     `json:"id"`
-	Status    StatusEnum `json:"status"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+type BaseEntry struct {
+	ID         uint64        `json:"id" gorm:"primaryKey"`
+	Status     shared.Status `json:"status" gorm:"index,default:1"`
+	CreateTime time.Time     `json:"createTime" gorm:"autoCreateTime"`
+	UpdateTime time.Time     `json:"updateTime" gorm:"autoUpdateTime"`
 }
 
 func (s StatusEnum) IsEnabled() bool {

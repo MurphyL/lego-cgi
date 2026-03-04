@@ -6,6 +6,6 @@ use (
 	./biz
 	./cgi
 	./dal
-	./pkg
+	./fns
 	./res
 )

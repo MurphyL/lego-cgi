@@ -2,7 +2,7 @@ package tag
 
 import (
 	"murphyl.com/lego/dal"
-	"murphyl.com/lego/pkg/period"
+	"murphyl.com/lego/fns/period"
 )
 
 // tag 模块是标签管理模块，用于管理各种类型的标签
@@ -19,7 +19,7 @@ const (
 
 // Tag 标签定义
 type Tag struct {
-	dal.Model
+	dal.BaseEntry
 	period.PeriodValid
 	ID          uint64         `json:"id"`
 	Code        string         `json:"code"`

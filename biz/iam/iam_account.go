@@ -6,13 +6,64 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 )
+
+// iam 模块是身份与访问管理模块，包含用户管理、RBAC权限控制、租户管理等功能
+// 主要功能包括：用户登录、登出、获取用户信息、重置密码、获取验证码等
+
+// Account 可登录账号
+type Account struct {
+	ID       uint   `gorm:"primarykey" json:"id"`
+	PersonID uint   `gorm:"uniqueIndex" json:"personId"`
+	Username string `gorm:"uniqueIndex" json:"username"`
+	Password string `json:"-"`
+	Mobile   string `json:"mobile"`
+	Email    string `json:"email"`
+	Avatar   string `json:"avatar"` // 头像URL
+}
+
+// 映射表名
+func (a Account) TableName() string {
+	return "sys_account"
+}
+
+// CaptchaRequest 获取验证码请求
+type CaptchaRequest struct {
+	Type string `json:"type"` // 验证码类型：login, reset, register
+}
+
+// CaptchaResponse 获取验证码响应
+type CaptchaResponse struct {
+	Key  string `json:"key"`
+	Data string `json:"data"` // 验证码图片数据或验证码代码
+}
 
 // 密钥，实际应用中应该从配置文件或环境变量中获取
 var jwtSecret = []byte("your-secret-key")
 
+// NewAccountHandler 创建账户处理器
+func NewAccountHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		h := &AccountHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
+}
+
+type AccountHandler struct {
+	db *gorm.DB
+}
+
+func (ah *AccountHandler) RegisterRoutes(router fiber.Router) {
+	router.Post("/login", ah.LoginHandler)
+	router.Post("/logout", ah.LogoutHandler)
+	router.Get("/profile", ah.GetUserProfileHandler)
+	router.Put("/profile", ah.UpdateProfileHandler)
+	router.Post("/reset-password", ah.ResetPasswordHandler)
+}
+
 // LoginHandler 登录处理函数
-func LoginHandler(c fiber.Ctx) error {
+func (ah *AccountHandler) LoginHandler(c fiber.Ctx) error {
 	var req PasswordLoginArgs
 	body := c.Body()
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -58,7 +109,7 @@ func LoginHandler(c fiber.Ctx) error {
 }
 
 // LogoutHandler 登出处理函数
-func LogoutHandler(c fiber.Ctx) error {
+func (ah *AccountHandler) LogoutHandler(c fiber.Ctx) error {
 	// 实际应用中可能需要将token加入黑名单
 	return c.Status(fiber.StatusOK).JSON(LogoutResponse{
 		Success: true,
@@ -66,7 +117,7 @@ func LogoutHandler(c fiber.Ctx) error {
 }
 
 // GetUserProfileHandler 获取用户信息处理函数
-func GetUserProfileHandler(c fiber.Ctx) error {
+func (ah *AccountHandler) GetUserProfileHandler(c fiber.Ctx) error {
 	// 实际应用中应该从token中获取用户信息
 	// 这里只是模拟用户信息
 	user := Account{
@@ -92,7 +143,7 @@ func GetUserProfileHandler(c fiber.Ctx) error {
 }
 
 // ResetPasswordHandler 重置密码处理函数
-func ResetPasswordHandler(c fiber.Ctx) error {
+func (ah *AccountHandler) ResetPasswordHandler(c fiber.Ctx) error {
 	var req ResetPasswordRequest
 	body := c.Body()
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -144,7 +195,7 @@ func CaptchaHandler(c fiber.Ctx) error {
 }
 
 // UpdateProfileHandler 更新用户资料处理函数
-func UpdateProfileHandler(c fiber.Ctx) error {
+func (ah *AccountHandler) UpdateProfileHandler(c fiber.Ctx) error {
 	var req UpdateProfileRequest
 	body := c.Body()
 	if err := json.Unmarshal(body, &req); err != nil {

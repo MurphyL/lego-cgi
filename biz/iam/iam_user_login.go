@@ -1,36 +1,5 @@
 package iam
 
-// iam 模块是身份与访问管理模块，包含用户管理、RBAC权限控制、租户管理等功能
-// 主要功能包括：用户登录、登出、获取用户信息、重置密码、获取验证码等
-
-// PersonInfo 公民信息
-type PersonInfo struct {
-	Id         uint64 `json:"id"`
-	RealName   string `json:"realName"`
-	IdCardType string `json:"idCardType"` // 证件类型
-	IdCardNo   string `json:"idCardNo"`
-}
-
-func (a PersonInfo) TableName() string {
-	return "base_person"
-}
-
-// Account 可登录账号
-type Account struct {
-	ID       uint   `gorm:"primarykey" json:"id"`
-	PersonID uint   `gorm:"uniqueIndex" json:"personId"`
-	Username string `gorm:"uniqueIndex" json:"username"`
-	Password string `json:"-"`
-	Mobile   string `json:"mobile"`
-	Email    string `json:"email"`
-	Avatar   string `json:"avatar"` // 头像URL
-}
-
-// 映射表名
-func (a Account) TableName() string {
-	return "sys_account"
-}
-
 // LoginMethod 登录方式
 type LoginMethod string
 
@@ -78,12 +47,6 @@ type LogoutResponse struct {
 	Success bool `json:"success"`
 }
 
-// UserProfileResponse 用户信息响应
-type UserProfileResponse struct {
-	User       Account    `json:"user"`
-	PersonInfo PersonInfo `json:"personInfo"`
-}
-
 // ResetPasswordRequest 重置密码请求
 type ResetPasswordRequest struct {
 	Username    string `json:"username"`
@@ -100,28 +63,4 @@ func (r *ResetPasswordRequest) ValidRequest() bool {
 // ResetPasswordResponse 重置密码响应
 type ResetPasswordResponse struct {
 	Success bool `json:"success"`
-}
-
-// CaptchaRequest 获取验证码请求
-type CaptchaRequest struct {
-	Type string `json:"type"` // 验证码类型：login, reset, register
-}
-
-// CaptchaResponse 获取验证码响应
-type CaptchaResponse struct {
-	Key  string `json:"key"`
-	Data string `json:"data"` // 验证码图片数据或验证码代码
-}
-
-// UpdateProfileRequest 更新用户资料请求
-type UpdateProfileRequest struct {
-	Email  string `json:"email"`  // 邮箱
-	Mobile string `json:"mobile"` // 手机号
-	Avatar string `json:"avatar"` // 头像URL
-}
-
-// UpdateProfileResponse 更新用户资料响应
-type UpdateProfileResponse struct {
-	Success bool    `json:"success"`
-	User    Account `json:"user"`
 }

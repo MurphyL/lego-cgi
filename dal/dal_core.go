@@ -2,6 +2,7 @@ package dal
 
 import (
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -10,9 +11,16 @@ import (
 // 主要功能包括：数据的增删改查、分页查询、事务处理等
 
 func New(dial func(string) gorm.Dialector, dsn string) *gorm.DB {
-	db, err := gorm.Open(dial(dsn))
+	dao, err := gorm.Open(dial(dsn))
 	if err != nil {
 		panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
 	}
-	return db
+	db, _ := dao.DB()
+	// SetMaxIdleConns 用于设置连接池中空闲连接的最大数量。
+	db.SetMaxIdleConns(10)
+	// SetMaxOpenConns 设置打开数据库连接的最大数量。
+	db.SetMaxOpenConns(100)
+	// SetConnMaxLifetime 设置了连接可复用的最大时间。
+	db.SetConnMaxLifetime(time.Hour)
+	return dao
 }

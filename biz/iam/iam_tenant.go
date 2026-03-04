@@ -5,7 +5,32 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"murphyl.com/lego/fns/shared"
 )
+
+/** 租户 **/
+
+type Tenant struct {
+	ID          uint64        `json:"id"`
+	Name        string        `json:"name"`
+	Code        string        `json:"code"`
+	Description string        `json:"description"`
+	Status      shared.Status `json:"status"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	UpdatedAt   time.Time     `json:"updatedAt"`
+	ExpiredAt   *time.Time    `json:"expiredAt"`
+}
+
+// 租户成员
+type TenantMember struct {
+	ID        uint64        `json:"id"`
+	TenantID  uint64        `json:"tenantId"`
+	UserID    uint64        `json:"userId"`
+	RoleID    uint64        `json:"roleId"`
+	Status    shared.Status `json:"status"`
+	CreatedAt time.Time     `json:"createdAt"`
+	UpdatedAt time.Time     `json:"updatedAt"`
+}
 
 // TenantRequest 租户请求
 type TenantRequest struct {
