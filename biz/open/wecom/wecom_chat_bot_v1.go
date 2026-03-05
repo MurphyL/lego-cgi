@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"murphyl.com/lego/fns/perform"
 )
@@ -14,35 +13,34 @@ import (
 // 企业微信群聊机器人 - https://developer.work.weixin.qq.com/document/path/99110
 
 const (
-	WecomChatBotWebook = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%v"
-	DefaultTimeout     = 10 * time.Second
-	DefaultMaxRetries  = 3
+	chatBotWebook = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%v"
 )
 
-type MessageType string
+type messageType string
 
-type MessagePack map[string]any
+type messagePack map[string]any
 
-// 文本消息配置项
-type TextMessageOption func(MessagePack)
+// 发送消息的可选配置项
+type messageOption func(messagePack)
 
 const (
-	MessageTypeText     MessageType = "text"        // 文本消息
-	MessageTypeMarkdown MessageType = "markdown_v2" // Markdown消息
-	MessageTypeImage    MessageType = "image"       // 图片消息
-	MessageTypeVoice    MessageType = "voice"       // 语音消息
-	MessageTypeFile     MessageType = "file"        // 文件消息
-	MessageTypeNews     MessageType = "news"        // 图文消息
+	MessageTypeText     messageType = "text"        // 文本消息
+	MessageTypeMarkdown messageType = "markdown_v2" // Markdown消息
+	MessageTypeImage    messageType = "image"       // 图片消息
+	MessageTypeVoice    messageType = "voice"       // 语音消息
+	MessageTypeFile     messageType = "file"        // 文件消息
+	MessageTypeNews     messageType = "news"        // 图文消息
 )
 
-type WecomChatBot struct {
+type ChatBot struct {
 	makeRequest perform.PerformAgent[*http.Request, []byte]
 	httpClient  *http.Client
 }
 
-func NewWecomChatBot(robotKey string) WecomChatBot {
-	robotEndpoint := fmt.Sprintf(WecomChatBotWebook, robotKey)
-	return WecomChatBot{
+// 新建企业微信群聊机器人
+func NewChatBot(robotKey string) ChatBot {
+	robotEndpoint := fmt.Sprintf(chatBotWebook, robotKey)
+	return ChatBot{
 		httpClient: http.DefaultClient,
 		makeRequest: func(b []byte) (*http.Request, error) {
 			httpReq, err := http.NewRequest(http.MethodPost, robotEndpoint, bytes.NewReader(b))
@@ -55,7 +53,8 @@ func NewWecomChatBot(robotKey string) WecomChatBot {
 	}
 }
 
-func (bot *WecomChatBot) SendTextMessage(content string, opts ...TextMessageOption) error {
+// 发送文本消息
+func (bot *ChatBot) SendTextMessage(content string, opts ...messageOption) error {
 	body := newMessage(MessageTypeText, content)
 	for _, opt := range opts {
 		opt(body)
@@ -63,40 +62,27 @@ func (bot *WecomChatBot) SendTextMessage(content string, opts ...TextMessageOpti
 	return bot.sendMessage(body)
 }
 
-func AtAll() TextMessageOption {
-	return func(msg MessagePack) {
-		msg["mentioned_list"] = []string{"@all"}
-	}
-}
-
-func AtUserIds(userIds ...string) TextMessageOption {
-	return func(msg MessagePack) {
-		msg["mentioned_list"] = userIds
-	}
-}
-
-func AtMobiles(userIds ...string) TextMessageOption {
-	return func(msg MessagePack) {
-		msg["mentioned_mobile_list"] = userIds
-	}
-}
-
-func (bot *WecomChatBot) SendMarkdownMessage(content string) error {
+// 发送Markdown消息
+func (bot *ChatBot) SendMarkdownMessage(content string) error {
 	body := newMessage(MessageTypeMarkdown, content)
 	return bot.sendMessage(body)
 }
 
-func (bot *WecomChatBot) sendMessage(body map[string]any) error {
+// 发送消息
+func (bot *ChatBot) sendMessage(body map[string]any) error {
 	messageBytes, _ := json.Marshal(body)
+	// 构造请求
 	httpReq, err := bot.makeRequest(messageBytes)
 	if err != nil {
 		return fmt.Errorf("构造请求出错：%v", err.Error())
 	}
+	// 发送请求
 	httpResp, err := bot.httpClient.Do(httpReq)
 	if err != nil {
 		return fmt.Errorf("发送请求出错：%v", err.Error())
 	}
 	defer httpResp.Body.Close()
+	// 验证请求响应
 	if httpResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("发送请求出错：%v", httpResp.Status)
 	}
@@ -111,7 +97,8 @@ func (bot *WecomChatBot) sendMessage(body map[string]any) error {
 	}
 }
 
-func newMessage(msgtype MessageType, content string) MessagePack {
+// 构造请求
+func newMessage(msgtype messageType, content string) messagePack {
 	message := map[string]any{"msgtype": msgtype}
 	switch msgtype {
 	case MessageTypeText: // 文本消息，支持@用户

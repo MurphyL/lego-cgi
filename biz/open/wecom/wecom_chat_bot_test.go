@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewWecomChatBot(t *testing.T) {
-	robot := NewWecomChatBot("c080ed83-cf23-46cf-a8f7-fc3e1a28f9b5")
+	robot := NewChatBot("c080ed83-cf23-46cf-a8f7-fc3e1a28f9b5")
 	t.Run("SendTextMessage", func(t *testing.T) {
 		err := robot.SendTextMessage("发布消息", AtAll())
 		if err != nil {
