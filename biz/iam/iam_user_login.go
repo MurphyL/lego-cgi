@@ -1,5 +1,12 @@
 package iam
 
+import (
+	"encoding/json"
+
+	"github.com/gofiber/fiber/v3"
+	"gorm.io/gorm"
+)
+
 // LoginMethod 登录方式
 type LoginMethod string
 
@@ -47,20 +54,65 @@ type LogoutResponse struct {
 	Success bool `json:"success"`
 }
 
-// ResetPasswordRequest 重置密码请求
-type ResetPasswordRequest struct {
-	Username    string `json:"username"`
-	OldPassword string `json:"oldPassword"`
-	NewPassword string `json:"newPassword"`
-	CaptchaCode string `json:"captchaCode"`
-	CaptchaKey  string `json:"captchaKey"`
+type LoginHandler struct {
+	db *gorm.DB
 }
 
-func (r *ResetPasswordRequest) ValidRequest() bool {
-	return r.Username != "" && r.OldPassword != "" && r.NewPassword != "" && r.CaptchaCode != "" && r.CaptchaKey != ""
+func (ah *LoginHandler) RegisterRoutes(router fiber.Router) {
+	router.Post("/login", ah.LoginHandler)
+	router.Post("/logout", ah.LogoutHandler)
 }
 
-// ResetPasswordResponse 重置密码响应
-type ResetPasswordResponse struct {
-	Success bool `json:"success"`
+// LoginHandler 登录处理函数
+func (ah *LoginHandler) LoginHandler(c fiber.Ctx) error {
+	var req PasswordLoginArgs
+	body := c.Body()
+	if err := json.Unmarshal(body, &req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
+	}
+
+	if !req.ValidRequest() {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request parameters"})
+	}
+
+	// 验证验证码（实际应用中应该从缓存中获取验证码进行验证）
+	// if !verifyCaptcha(req.CaptchaKey, req.CaptchaCode) {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid captcha"})
+	// }
+
+	// 验证用户名和密码（实际应用中应该从数据库中查询）
+	// 这里只是模拟验证
+	if req.Username != "admin" || req.Password != "password" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid username or password"})
+	}
+
+	// 生成JWT token
+	token, expiresAt, err := generateToken(req.Username)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate token"})
+	}
+
+	// 模拟用户信息
+	user := Account{
+		ID:       1,
+		PersonID: 1,
+		Username: req.Username,
+		Mobile:   "13800138000",
+		Email:    "admin@example.com",
+		Avatar:   "https://example.com/avatar.jpg", // 模拟头像URL
+	}
+
+	return c.Status(fiber.StatusOK).JSON(LoginResponse{
+		Token:     token,
+		ExpiresAt: expiresAt,
+		User:      user,
+	})
+}
+
+// LogoutHandler 登出处理函数
+func (ah *LoginHandler) LogoutHandler(c fiber.Ctx) error {
+	// 实际应用中可能需要将token加入黑名单
+	return c.Status(fiber.StatusOK).JSON(LogoutResponse{
+		Success: true,
+	})
 }
