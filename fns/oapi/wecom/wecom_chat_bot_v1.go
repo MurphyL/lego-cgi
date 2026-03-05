@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"murphyl.com/lego/fns/perform"
+	"murphyl.com/lego/fns/oapi"
 )
 
 // 企业微信群聊机器人 - https://developer.work.weixin.qq.com/document/path/99110
@@ -33,7 +33,7 @@ const (
 )
 
 type ChatBot struct {
-	makeRequest perform.PerformAgent[*http.Request, []byte]
+	makeRequest oapi.PerformAgent[*http.Request, []byte]
 	httpClient  *http.Client
 }
 

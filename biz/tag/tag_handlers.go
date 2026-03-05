@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/gofiber/fiber/v3"
-	"murphyl.com/lego/dal"
 )
 
 // TagRequest 标签请求
@@ -22,7 +21,7 @@ func NewSystemTag(code, name, desc string) *Tag {
 }
 
 func NewTag(tagType Type, code, name, desc string) *Tag {
-	return &Tag{Type: tagType, Code: code, Name: name, Description: desc, Status: dal.StatusEnabled}
+	return &Tag{Type: tagType, Code: code, Name: name, Description: desc}
 }
 
 // CreateTagHandler 创建标签
@@ -47,7 +46,6 @@ func CreateTagHandler(c fiber.Ctx) error {
 		Description: req.Description,
 		Type:        Type(req.Type),
 		Weight:      req.Weight,
-		Status:      dal.StatusEnum(req.Status),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(tag)
@@ -75,7 +73,6 @@ func UpdateTagHandler(c fiber.Ctx) error {
 		Description: req.Description,
 		Type:        Type(req.Type),
 		Weight:      req.Weight,
-		Status:      dal.StatusEnum(req.Status),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(tag)
@@ -112,7 +109,6 @@ func GetTagHandler(c fiber.Ctx) error {
 		Description: "系统默认标签",
 		Type:        TypeSystem,
 		Weight:      100,
-		Status:      dal.StatusEnabled,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(tag)
@@ -127,35 +123,7 @@ func ListTagsHandler(c fiber.Ctx) error {
 	// }
 
 	// 模拟标签列表
-	tags := []Tag{
-		{
-			ID:          1,
-			Code:        "system",
-			Name:        "系统标签",
-			Description: "系统默认标签",
-			Type:        TypeSystem,
-			Weight:      100,
-			Status:      dal.StatusEnabled,
-		},
-		{
-			ID:          2,
-			Code:        "manual",
-			Name:        "手动标签",
-			Description: "手动添加的标签",
-			Type:        TypeManual,
-			Weight:      50,
-			Status:      dal.StatusEnabled,
-		},
-		{
-			ID:          3,
-			Code:        "rule",
-			Name:        "规则标签",
-			Description: "根据规则生成的标签",
-			Type:        TypeRuleBased,
-			Weight:      75,
-			Status:      dal.StatusEnabled,
-		},
-	}
+	tags := []Tag{}
 
 	return c.Status(fiber.StatusOK).JSON(tags)
 }

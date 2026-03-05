@@ -5,65 +5,53 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"murphyl.com/lego/fns/shared"
+	"murphyl.com/lego/fns/entry"
 )
 
 /* 基于角色的访问控制模块 */
 
 type Role struct {
-	ID          uint64            `json:"id"`
-	Code        string            `json:"code"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Status      shared.Status     `json:"status"`
-	TenantID    uint64            `json:"tenantId"`
-	Scope       shared.ScopeEntry `json:"scope"`
-	CreatedAt   time.Time         `json:"createdAt"`
-	UpdatedAt   time.Time         `json:"updatedAt"`
+	entry.BaseEntry
+	Code        string    `json:"code"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	TenantID    uint64    `json:"tenantId"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type User struct {
-	ID        uint64            `json:"id"`
-	Username  string            `json:"username"`
-	Name      string            `json:"name"`
-	Email     string            `json:"email"`
-	Mobile    string            `json:"mobile"`
-	Status    shared.Status     `json:"status"`
-	TenantID  uint64            `json:"tenantId"`
-	Scope     shared.ScopeEntry `json:"scope"`
-	CreatedAt time.Time         `json:"createdAt"`
-	UpdatedAt time.Time         `json:"updatedAt"`
+	entry.BaseEntry
+	Username string `json:"username"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Mobile   string `json:"mobile"`
+	TenantID uint64 `json:"tenantId"`
 }
 
 type Perm struct {
-	ID          uint64            `json:"id"`
-	Code        string            `json:"code"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Type        string            `json:"type"`   // menu, button, api
-	Path        string            `json:"path"`   // 菜单路径或API路径
-	Method      string            `json:"method"` // HTTP方法
-	Status      shared.Status     `json:"status"`
-	Scope       shared.ScopeEntry `json:"scope"`
-	CreatedAt   time.Time         `json:"createdAt"`
-	UpdatedAt   time.Time         `json:"updatedAt"`
+	entry.BaseEntry
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Type        string `json:"type"`   // menu, button, api
+	Path        string `json:"path"`   // 菜单路径或API路径
+	Method      string `json:"method"` // HTTP方法
 }
 
 // 角色-权限关联
 type RolePerm struct {
-	ID        uint64    `json:"id"`
-	RoleID    uint64    `json:"roleId"`
-	PermID    uint64    `json:"permId"`
-	CreatedAt time.Time `json:"createdAt"`
+	entry.BaseEntry
+	RoleID uint64 `json:"roleId"`
+	PermID uint64 `json:"permId"`
 }
 
 // 用户-角色关联
 type UserRole struct {
-	ID        uint64    `json:"id"`
-	UserID    uint64    `json:"userId"`
-	RoleID    uint64    `json:"roleId"`
-	TenantID  uint64    `json:"tenantId"`
-	CreatedAt time.Time `json:"createdAt"`
+	entry.BaseEntry
+	UserID   uint64 `json:"userId"`
+	RoleID   uint64 `json:"roleId"`
+	TenantID uint64 `json:"tenantId"`
 }
 
 // RoleRequest 角色请求
@@ -115,11 +103,9 @@ func CreateRoleHandler(c fiber.Ctx) error {
 
 	// 模拟角色创建
 	role := Role{
-		ID:          1,
 		Code:        req.Code,
 		Name:        req.Name,
 		Description: req.Description,
-		Status:      1,
 		TenantID:    req.TenantID,
 	}
 
@@ -142,11 +128,9 @@ func UpdateRoleHandler(c fiber.Ctx) error {
 
 	// 模拟角色更新
 	role := Role{
-		ID:          1,
 		Code:        req.Code,
 		Name:        req.Name,
 		Description: req.Description,
-		Status:      1,
 		TenantID:    req.TenantID,
 	}
 
@@ -178,11 +162,9 @@ func GetRoleHandler(c fiber.Ctx) error {
 
 	// 模拟角色获取
 	role := Role{
-		ID:          1,
 		Code:        "admin",
 		Name:        "管理员",
 		Description: "系统管理员角色",
-		Status:      1,
 		TenantID:    1,
 	}
 
@@ -200,19 +182,15 @@ func ListRolesHandler(c fiber.Ctx) error {
 	// 模拟角色列表
 	roles := []Role{
 		{
-			ID:          1,
 			Code:        "admin",
 			Name:        "管理员",
 			Description: "系统管理员角色",
-			Status:      1,
 			TenantID:    1,
 		},
 		{
-			ID:          2,
 			Code:        "user",
 			Name:        "普通用户",
 			Description: "普通用户角色",
-			Status:      1,
 			TenantID:    1,
 		},
 	}
@@ -236,14 +214,12 @@ func CreatePermHandler(c fiber.Ctx) error {
 
 	// 模拟权限创建
 	perm := Perm{
-		ID:          1,
 		Code:        req.Code,
 		Name:        req.Name,
 		Description: req.Description,
 		Type:        req.Type,
 		Path:        req.Path,
 		Method:      req.Method,
-		Status:      1,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(perm)
@@ -265,14 +241,12 @@ func UpdatePermHandler(c fiber.Ctx) error {
 
 	// 模拟权限更新
 	perm := Perm{
-		ID:          1,
 		Code:        req.Code,
 		Name:        req.Name,
 		Description: req.Description,
 		Type:        req.Type,
 		Path:        req.Path,
 		Method:      req.Method,
-		Status:      1,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(perm)
@@ -303,14 +277,12 @@ func GetPermHandler(c fiber.Ctx) error {
 
 	// 模拟权限获取
 	perm := Perm{
-		ID:          1,
 		Code:        "user:list",
 		Name:        "用户列表",
 		Description: "查看用户列表权限",
 		Type:        "menu",
 		Path:        "/users",
 		Method:      "GET",
-		Status:      1,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(perm)
@@ -327,24 +299,20 @@ func ListPermsHandler(c fiber.Ctx) error {
 	// 模拟权限列表
 	perms := []Perm{
 		{
-			ID:          1,
 			Code:        "user:list",
 			Name:        "用户列表",
 			Description: "查看用户列表权限",
 			Type:        "menu",
 			Path:        "/users",
 			Method:      "GET",
-			Status:      1,
 		},
 		{
-			ID:          2,
 			Code:        "user:create",
 			Name:        "创建用户",
 			Description: "创建用户权限",
 			Type:        "button",
 			Path:        "/users",
 			Method:      "POST",
-			Status:      1,
 		},
 	}
 

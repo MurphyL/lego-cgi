@@ -2,10 +2,9 @@ package cate
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"murphyl.com/lego/dal"
+	"murphyl.com/lego/fns/entry"
 )
 
 // cate 模块是分类管理模块，用于管理各种类型的分类
@@ -13,17 +12,14 @@ import (
 
 // Category 分类定义
 type Category struct {
-	ID          uint64         `json:"id"`
-	ParentID    *uint64        `json:"parentId"` // 父分类ID，根分类为nil
-	Code        string         `json:"code"`
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	Level       int            `json:"level"`  // 分类层级
-	Path        string         `json:"path"`   // 分类路径，如：1/2/3
-	Weight      int            `json:"weight"` // 排序权重
-	Status      dal.StatusEnum `json:"status"`
-	CreatedAt   time.Time      `json:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt"`
+	entry.BaseEntry
+	ParentID    *uint64 `json:"parentId"` // 父分类ID，根分类为nil
+	Code        string  `json:"code"`
+	Name        string  `json:"name"`
+	Description string  `json:"description,omitempty"`
+	Level       int     `json:"level"`  // 分类层级
+	Path        string  `json:"path"`   // 分类路径，如：1/2/3
+	Weight      int     `json:"weight"` // 排序权重
 }
 
 // CategoryWithChildren 带子分类的分类定义
@@ -63,7 +59,6 @@ func CreateCategoryHandler(c fiber.Ctx) error {
 
 	// 模拟分类创建
 	category := Category{
-		ID:          1,
 		ParentID:    req.ParentID,
 		Code:        req.Code,
 		Name:        req.Name,
@@ -71,7 +66,6 @@ func CreateCategoryHandler(c fiber.Ctx) error {
 		Level:       1,
 		Path:        "1",
 		Weight:      req.Weight,
-		Status:      dal.StatusEnum(req.Status),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(category)
@@ -93,7 +87,6 @@ func UpdateCategoryHandler(c fiber.Ctx) error {
 
 	// 模拟分类更新
 	category := Category{
-		ID:          1,
 		ParentID:    req.ParentID,
 		Code:        req.Code,
 		Name:        req.Name,
@@ -101,7 +94,6 @@ func UpdateCategoryHandler(c fiber.Ctx) error {
 		Level:       1,
 		Path:        "1",
 		Weight:      req.Weight,
-		Status:      dal.StatusEnum(req.Status),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(category)
@@ -132,7 +124,6 @@ func GetCategoryHandler(c fiber.Ctx) error {
 
 	// 模拟分类获取
 	category := Category{
-		ID:          1,
 		ParentID:    nil,
 		Code:        "root",
 		Name:        "根分类",
@@ -140,7 +131,6 @@ func GetCategoryHandler(c fiber.Ctx) error {
 		Level:       1,
 		Path:        "1",
 		Weight:      100,
-		Status:      dal.StatusEnabled,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(category)
@@ -157,7 +147,6 @@ func ListCategoriesHandler(c fiber.Ctx) error {
 	// 模拟分类列表
 	categories := []Category{
 		{
-			ID:          1,
 			ParentID:    nil,
 			Code:        "root",
 			Name:        "根分类",
@@ -165,10 +154,8 @@ func ListCategoriesHandler(c fiber.Ctx) error {
 			Level:       1,
 			Path:        "1",
 			Weight:      100,
-			Status:      dal.StatusEnabled,
 		},
 		{
-			ID:          2,
 			ParentID:    uintPtr(1),
 			Code:        "electronics",
 			Name:        "电子产品",
@@ -176,10 +163,8 @@ func ListCategoriesHandler(c fiber.Ctx) error {
 			Level:       2,
 			Path:        "1/2",
 			Weight:      90,
-			Status:      dal.StatusEnabled,
 		},
 		{
-			ID:          3,
 			ParentID:    uintPtr(2),
 			Code:        "phones",
 			Name:        "手机",
@@ -187,7 +172,6 @@ func ListCategoriesHandler(c fiber.Ctx) error {
 			Level:       3,
 			Path:        "1/2/3",
 			Weight:      80,
-			Status:      dal.StatusEnabled,
 		},
 	}
 
@@ -205,7 +189,6 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 	// 模拟分类树
 	categoryTree := CategoryWithChildren{
 		Category: Category{
-			ID:          1,
 			ParentID:    nil,
 			Code:        "root",
 			Name:        "根分类",
@@ -213,12 +196,10 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 			Level:       1,
 			Path:        "1",
 			Weight:      100,
-			Status:      dal.StatusEnabled,
 		},
 		Children: []CategoryWithChildren{
 			{
 				Category: Category{
-					ID:          2,
 					ParentID:    uintPtr(1),
 					Code:        "electronics",
 					Name:        "电子产品",
@@ -226,12 +207,10 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 					Level:       2,
 					Path:        "1/2",
 					Weight:      90,
-					Status:      dal.StatusEnabled,
 				},
 				Children: []CategoryWithChildren{
 					{
 						Category: Category{
-							ID:          3,
 							ParentID:    uintPtr(2),
 							Code:        "phones",
 							Name:        "手机",
@@ -239,12 +218,10 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 							Level:       3,
 							Path:        "1/2/3",
 							Weight:      80,
-							Status:      dal.StatusEnabled,
 						},
 					},
 					{
 						Category: Category{
-							ID:          4,
 							ParentID:    uintPtr(2),
 							Code:        "laptops",
 							Name:        "笔记本电脑",
@@ -252,14 +229,12 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 							Level:       3,
 							Path:        "1/2/4",
 							Weight:      70,
-							Status:      dal.StatusEnabled,
 						},
 					},
 				},
 			},
 			{
 				Category: Category{
-					ID:          5,
 					ParentID:    uintPtr(1),
 					Code:        "clothing",
 					Name:        "服装",
@@ -267,7 +242,6 @@ func GetCategoryTreeHandler(c fiber.Ctx) error {
 					Level:       2,
 					Path:        "1/5",
 					Weight:      85,
-					Status:      dal.StatusEnabled,
 				},
 			},
 		},

@@ -50,9 +50,9 @@ func main() {
 
 func loadConfig() *AppConfig {
 	appConfig := &AppConfig{}
-	shared.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", AppTitle, "应用标题")
-	shared.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", BindAddr, "应用绑定地址")
-	shared.LoadProperty(&appConfig.dsn, "GO_DSN_MYSQL", DataSourceName, "数据库连接地址")
+	shared.LoadProperty(&appConfig.title, "LEGO_APP_TITLE", AppTitle)
+	shared.LoadProperty(&appConfig.addr, "LEGO_BIND_ADDR", BindAddr)
+	shared.LoadProperty(&appConfig.dsn, "GO_DSN_MYSQL", DataSourceName)
 	return appConfig
 }
 

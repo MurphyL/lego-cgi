@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 	"murphyl.com/lego/cgi"
-	"murphyl.com/lego/dal"
+	"murphyl.com/lego/fns/entry"
 	"murphyl.com/lego/fns/sugar"
 )
 
@@ -15,7 +15,7 @@ var sugarLogger = sugar.NewSugarLogger()
 // 数据字典模块，主要功能包括：字典类型管理、字典项管理、字典组管理等
 
 type DictType struct {
-	dal.BaseEntry
+	entry.BaseEntry
 	DictCode    string `json:"dictCode"`
 	DictName    string `json:"dictName"`
 	Description string `json:"description"`
@@ -23,7 +23,7 @@ type DictType struct {
 }
 
 type DictItem struct {
-	dal.BaseEntry
+	entry.BaseEntry
 	DictCode  string `json:"dictCode"`
 	ItemLabel string `json:"itemLabel"`
 	ItemValue string `json:"itemValue"`

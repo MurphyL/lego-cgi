@@ -11,76 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"murphyl.com/lego/biz/open"
 )
-
-// 初始化时注册机器人工厂
-func init() {
-	open.RegisterChatBotFactory(open.BotTypeDingtalk, &dingtalkChatBotFactory{})
-}
-
-// dingtalkChatBotFactory 钉钉机器人工厂
-type dingtalkChatBotFactory struct{}
-
-// CreateBot 创建钉钉机器人
-func (f *dingtalkChatBotFactory) CreateBot(config open.BotConfig) (open.ChatBot, error) {
-	bot, err := NewChatBot(config.AccessToken, config.Secret)
-	if err != nil {
-		return nil, err
-	}
-	return &dingtalkChatBotAdapter{bot: bot}, nil
-}
-
-// dingtalkChatBotAdapter 钉钉机器人适配器
-type dingtalkChatBotAdapter struct {
-	bot ChatBot
-}
-
-// CreateRequest 创建HTTP请求
-func (a *dingtalkChatBotAdapter) CreateRequest(ctx context.Context, data any) (*http.Request, error) {
-	return a.bot.CreateRequest(ctx, data)
-}
-
-// SendMessage 发送消息
-func (a *dingtalkChatBotAdapter) SendMessage(ctx context.Context, message open.Message) error {
-	return a.bot.SendMessage(ctx, message)
-}
-
-// SendText 发送文本消息
-func (a *dingtalkChatBotAdapter) SendText(ctx context.Context, content string, options map[string]interface{}) error {
-	return a.bot.SendText(ctx, content, options)
-}
-
-// SendMarkdown 发送Markdown消息
-func (a *dingtalkChatBotAdapter) SendMarkdown(ctx context.Context, content string, options map[string]interface{}) error {
-	return a.bot.SendMarkdown(ctx, content, options)
-}
-
-// SendImage 发送图片消息
-func (a *dingtalkChatBotAdapter) SendImage(ctx context.Context, imageData map[string]string) error {
-	return a.bot.SendImage(ctx, imageData)
-}
-
-// SendNews 发送图文消息
-func (a *dingtalkChatBotAdapter) SendNews(ctx context.Context, articles []map[string]string) error {
-	return a.bot.SendNews(ctx, articles)
-}
-
-// SendLink 发送链接消息
-func (a *dingtalkChatBotAdapter) SendLink(ctx context.Context, linkData map[string]string) error {
-	return a.bot.SendLink(ctx, linkData)
-}
-
-// SendActionCard 发送行动卡片消息
-func (a *dingtalkChatBotAdapter) SendActionCard(ctx context.Context, cardData map[string]interface{}) error {
-	return a.bot.SendActionCard(ctx, cardData)
-}
-
-// SendFeedCard 发送Feed卡片消息
-func (a *dingtalkChatBotAdapter) SendFeedCard(ctx context.Context, links []map[string]string) error {
-	return a.bot.SendFeedCard(ctx, links)
-}
 
 // https://oapi.dingtalk.com/robot/send?access_token=ACCESS_TOKEN
 
