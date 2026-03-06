@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/prs/middleware"
 )
 
 /**
@@ -164,15 +163,15 @@ func NewTenantHandler(dao *gorm.DB) func(router fiber.Router) {
 
 // RegisterRoutes 注册路由
 func (h *TenantHandler) RegisterRoutes(router fiber.Router) {
-	router.Post("/tenants", middleware.AuthMiddleware("tenant:create"), h.CreateTenant)
-	router.Get("/tenants", middleware.AuthMiddleware("tenant:list"), h.ListTenants)
-	router.Get("/tenants/:id", middleware.AuthMiddleware("tenant:view"), h.GetTenant)
-	router.Put("/tenants/:id", middleware.AuthMiddleware("tenant:update"), h.UpdateTenant)
-	router.Delete("/tenants/:id", middleware.AuthMiddleware("tenant:delete"), h.DeleteTenant)
-	router.Post("/tenants/:id/followups", middleware.AuthMiddleware("tenant:create_followup"), h.CreateFollowup)
-	router.Get("/tenants/:id/followups", middleware.AuthMiddleware("tenant:list_followups"), h.ListFollowups)
-	router.Post("/tenants/:id/communications", middleware.AuthMiddleware("tenant:create_communication"), h.CreateCommunication)
-	router.Get("/tenants/:id/communications", middleware.AuthMiddleware("tenant:list_communications"), h.ListCommunications)
+	router.Post("/tenants", h.CreateTenant)
+	router.Get("/tenants", h.ListTenants)
+	router.Get("/tenants/:id", h.GetTenant)
+	router.Put("/tenants/:id", h.UpdateTenant)
+	router.Delete("/tenants/:id", h.DeleteTenant)
+	router.Post("/tenants/:id/followups", h.CreateFollowup)
+	router.Get("/tenants/:id/followups", h.ListFollowups)
+	router.Post("/tenants/:id/communications", h.CreateCommunication)
+	router.Get("/tenants/:id/communications", h.ListCommunications)
 }
 
 // CreateTenant 创建租户

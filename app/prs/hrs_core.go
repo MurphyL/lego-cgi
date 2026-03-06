@@ -6,9 +6,9 @@ import (
 	"murphyl.com/app/prs/handlers/property"
 	"murphyl.com/app/prs/handlers/tenant"
 
+	"murphyl.com/lego/biz/conf"
 	"murphyl.com/lego/biz/contract"
 	"murphyl.com/lego/biz/fin"
-	"murphyl.com/lego/biz/general"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/cgi"
 	"murphyl.com/lego/dal"
@@ -35,7 +35,7 @@ func main() {
 	dao := dal.New(mysql.Open, cnf.dsn)
 	app := cgi.NewLegoApp(cnf)
 	app.Mount("/account", iam.NewAccountHandler(dao))
-	app.Mount("/system", general.NewSystemDictHandler(dao))
+	app.Mount("/system", conf.NewSystemDictHandler(dao))
 	app.Mount("/finance", fin.NewFinanceHandler(dao))
 	app.Mount("/contract", contract.NewContractHandler(dao))
 	// 挂载租户管理路由

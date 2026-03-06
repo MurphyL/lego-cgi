@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/prs/middleware"
 )
 
 /**
@@ -28,21 +27,21 @@ func NewAnalyticsHandler(dao *gorm.DB) func(router fiber.Router) {
 // RegisterRoutes 注册路由
 func (h *AnalyticsHandler) RegisterRoutes(router fiber.Router) {
 	// 房源分析
-	router.Get("/analytics/property/vacancy-rate", middleware.AuthMiddleware("analytics:property_vacancy"), h.GetPropertyVacancyRate)
-	router.Get("/analytics/property/rental-trend", middleware.AuthMiddleware("analytics:property_rental_trend"), h.GetRentalTrend)
-	router.Get("/analytics/property/heat-rank", middleware.AuthMiddleware("analytics:property_heat_rank"), h.GetPropertyHeatRank)
+	router.Get("/analytics/property/vacancy-rate", h.GetPropertyVacancyRate)
+	router.Get("/analytics/property/rental-trend", h.GetRentalTrend)
+	router.Get("/analytics/property/heat-rank", h.GetPropertyHeatRank)
 
 	// 租户分析
-	router.Get("/analytics/tenant/level-distribution", middleware.AuthMiddleware("analytics:tenant_level"), h.GetTenantLevelDistribution)
-	router.Get("/analytics/tenant/demand-distribution", middleware.AuthMiddleware("analytics:tenant_demand"), h.GetTenantDemandDistribution)
+	router.Get("/analytics/tenant/level-distribution", h.GetTenantLevelDistribution)
+	router.Get("/analytics/tenant/demand-distribution", h.GetTenantDemandDistribution)
 
 	// 财务分析
-	router.Get("/analytics/finance/income-expense-trend", middleware.AuthMiddleware("analytics:finance_income_expense"), h.GetIncomeExpenseTrend)
-	router.Get("/analytics/finance/cash-flow", middleware.AuthMiddleware("analytics:finance_cash_flow"), h.GetCashFlow)
+	router.Get("/analytics/finance/income-expense-trend", h.GetIncomeExpenseTrend)
+	router.Get("/analytics/finance/cash-flow", h.GetCashFlow)
 
 	// 运营分析
-	router.Get("/analytics/operation/viewing-conversion", middleware.AuthMiddleware("analytics:operation_conversion"), h.GetViewingConversionRate)
-	router.Get("/analytics/operation/performance", middleware.AuthMiddleware("analytics:operation_performance"), h.GetOperationPerformance)
+	router.Get("/analytics/operation/viewing-conversion", h.GetViewingConversionRate)
+	router.Get("/analytics/operation/performance", h.GetOperationPerformance)
 }
 
 // GetPropertyVacancyRate 获取房源空置率

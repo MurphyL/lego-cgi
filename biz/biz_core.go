@@ -5,7 +5,6 @@ import (
 	"gorm.io/gorm"
 
 	"murphyl.com/lego/biz/cate"
-	"murphyl.com/lego/biz/corp"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/biz/tag"
 )
@@ -78,15 +77,5 @@ func UseCategoryManager(dao *gorm.DB) func(router fiber.Router) {
 		router.Get("/categories/:id", cate.GetCategoryHandler)
 		router.Get("/categories", cate.ListCategoriesHandler)
 		router.Get("/categories/tree", cate.GetCategoryTreeHandler)
-	}
-}
-
-// UseCorpManager 企业管理模块
-func UseCorpManager(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		router.Post("/corps", corp.ListCorpsHandler)
-		router.Get("/corps/:id", corp.GetCorpByIdHandler)
-		router.Get("/corps/by-code", corp.GetCorpByUnifiedCodeHandler)
-		router.Post("/corps/verify", corp.VerifyCorpHandler)
 	}
 }
