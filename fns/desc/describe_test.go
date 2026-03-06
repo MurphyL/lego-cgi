@@ -1,4 +1,4 @@
-package describe
+package desc
 
 import (
 	"maps"

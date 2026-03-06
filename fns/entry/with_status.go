@@ -1,7 +1,7 @@
 package entry
 
 // StatusEnum 状态枚举 - `json:"status" gorm:"index,default:1"`
-type StatusEnum uint8
+type StatusEnum uint16
 
 // Status 枚举
 const (

@@ -13,6 +13,7 @@ type LoginMethod string
 // 登录类型
 const (
 	LoginMethodPassword     LoginMethod = "password"      // 密码登录
+	LoginMethodLDAP         LoginMethod = "ldap"          // LDAP登录
 	LoginMethodEmail        LoginMethod = "email_code"    // 邮箱验证码登录
 	LoginMethodPhone        LoginMethod = "phone_code"    // 手机验证码登录
 	LoginMethodWechatQrcode LoginMethod = "wechat_qrcode" // 微信二维码登录

@@ -42,3 +42,15 @@ func CreateOne[T any](c fiber.Ctx, db *gorm.DB) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(payload)
 }
+
+func DeleteOne[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
+	var query = new(Q)
+	if err := c.Bind().All(query); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request")
+	}
+	if err := db.Where(query).Delete(new(T)).Error; err != nil {
+		sugarLogger.Error("删除记录出错：", err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"success": true})
+}

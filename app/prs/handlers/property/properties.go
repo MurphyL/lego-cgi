@@ -5,32 +5,46 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/prs/middleware"
+	"murphyl.com/lego/fns/entry"
 )
 
 /**
  * Property 房产
  */
 
+type PropertyStatusEnum string
+
+// 房产状态
+const (
+	PropertyStatusPending    PropertyStatusEnum = "pending"    // 待审核
+	PropertyStatusApproved   PropertyStatusEnum = "approved"   // 已通过
+	PropertyStatusRejected   PropertyStatusEnum = "rejected"   // 已驳回
+	PropertyStatusOnSale     PropertyStatusEnum = "on_sale"    // 已上架
+	PropertyStatusRented     PropertyStatusEnum = "rented"     // 已出租
+	PropertyStatusOffSale    PropertyStatusEnum = "off_sale"   // 已下架
+	PropertyStatusUnpaid     PropertyStatusEnum = "unpaid"     // 待支付
+	PropertyStatusPaid       PropertyStatusEnum = "paid"       // 已支付
+	PropertyStatusEffective  PropertyStatusEnum = "effective"  // 已生效
+	PropertyStatusTerminated PropertyStatusEnum = "terminated" // 已退租
+)
+
 // Property 房产基础信息
 type Property struct {
-	ID             uint      `gorm:"primaryKey" json:"id"`
-	PropertyCode   string    `gorm:"size:30;uniqueIndex" json:"property_code"`
-	PropertyTitle  string    `gorm:"size:100" json:"property_title"`
-	OwnerName      string    `gorm:"size:50" json:"owner_name"`
-	PropertyCertNo string    `gorm:"size:50;uniqueIndex" json:"property_cert_no"`
-	Address        string    `gorm:"size:255" json:"address"`
-	Area           float64   `json:"area"`
-	RoomType       string    `gorm:"size:20" json:"room_type"`
-	Orientation    string    `gorm:"size:10" json:"orientation"`
-	Decoration     uint8     `json:"decoration"`
-	RoomCount      int       `json:"room_count"`
-	Status         uint8     `json:"status"`
-	Price          float64   `json:"price"`
-	Description    string    `gorm:"type:text" json:"description"`
-	CreatorID      uint      `json:"creator_id"`
-	CreateTime     time.Time `json:"create_time"`
-	UpdateTime     time.Time `json:"update_time"`
+	entry.BaseEntry
+	Status         entry.StatusEnum `gorm:"index,default:1" json:"status"`
+	PropertyCode   string           `gorm:"size:30;uniqueIndex" json:"property_code"`
+	PropertyTitle  string           `gorm:"size:100" json:"property_title"`
+	OwnerName      string           `gorm:"size:50" json:"owner_name"`
+	PropertyCertNo string           `gorm:"size:50;uniqueIndex" json:"property_cert_no"`
+	Address        string           `gorm:"size:255" json:"address"`
+	Area           float64          `json:"area"`
+	RoomType       string           `gorm:"size:20" json:"room_type"`
+	Orientation    string           `gorm:"size:10" json:"orientation"`
+	Decoration     uint8            `json:"decoration"`
+	RoomCount      int              `json:"room_count"`
+
+	Price       float64 `json:"price"`
+	Description string  `gorm:"type:text" json:"description"`
 }
 
 func (*Property) TableName() string {
@@ -40,7 +54,7 @@ func (*Property) TableName() string {
 // PropertyImage 房源图片
 type PropertyImage struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
-	PropertyID uint      `json:"property_id"`
+	PropertyID uint64    `json:"property_id"`
 	ImageURL   string    `gorm:"size:500" json:"image_url"`
 	ImageType  uint8     `json:"image_type"`
 	SortOrder  int       `json:"sort_order"`
@@ -54,7 +68,7 @@ func (*PropertyImage) TableName() string {
 // PropertyTag 房源标签
 type PropertyTag struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
-	PropertyID uint      `json:"property_id"`
+	PropertyID uint64    `json:"property_id"`
 	TagName    string    `gorm:"size:50" json:"tag_name"`
 	CreateTime time.Time `json:"create_time"`
 }
@@ -66,7 +80,7 @@ func (*PropertyTag) TableName() string {
 // PropertyStatusLog 房源状态变更日志
 type PropertyStatusLog struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
-	PropertyID   uint      `json:"property_id"`
+	PropertyID   uint64    `json:"property_id"`
 	OldStatus    uint8     `json:"old_status"`
 	NewStatus    uint8     `json:"new_status"`
 	ChangeReason string    `gorm:"size:255" json:"change_reason"`
@@ -171,14 +185,14 @@ func NewPropertyHandler(dao *gorm.DB) func(router fiber.Router) {
 
 // RegisterRoutes 注册路由
 func (h *PropertyHandler) RegisterRoutes(router fiber.Router) {
-	router.Post("/properties", middleware.AuthMiddleware("property:create"), h.CreateProperty)
-	router.Get("/properties", middleware.AuthMiddleware("property:list"), h.ListProperties)
-	router.Get("/properties/:id", middleware.AuthMiddleware("property:view"), h.GetProperty)
-	router.Put("/properties/:id", middleware.AuthMiddleware("property:update"), h.UpdateProperty)
-	router.Delete("/properties/:id", middleware.AuthMiddleware("property:delete"), h.DeleteProperty)
-	router.Put("/properties/:id/status", middleware.AuthMiddleware("property:update_status"), h.ChangePropertyStatus)
-	router.Post("/properties/:id/viewings", middleware.AuthMiddleware("property:create_viewing"), h.CreateViewing)
-	router.Get("/properties/:id/viewings", middleware.AuthMiddleware("property:list_viewings"), h.ListViewings)
+	router.Post("/properties", h.CreateProperty)
+	router.Get("/properties", h.ListProperties)
+	router.Get("/properties/:id", h.GetProperty)
+	router.Put("/properties/:id", h.UpdateProperty)
+	router.Delete("/properties/:id", h.DeleteProperty)
+	router.Put("/properties/:id/status", h.ChangePropertyStatus)
+	router.Post("/properties/:id/viewings", h.CreateViewing)
+	router.Get("/properties/:id/viewings", h.ListViewings)
 }
 
 // CreateProperty 创建房源
@@ -206,9 +220,6 @@ func (h *PropertyHandler) CreateProperty(c fiber.Ctx) error {
 		Status:         0, // 待租
 		Price:          req.Price,
 		Description:    req.Description,
-		CreatorID:      1, // 暂时硬编码，实际应从会话中获取
-		CreateTime:     time.Now(),
-		UpdateTime:     time.Now(),
 	}
 
 	// 开始事务
@@ -221,7 +232,7 @@ func (h *PropertyHandler) CreateProperty(c fiber.Ctx) error {
 	// 处理图片
 	for _, img := range req.Images {
 		image := PropertyImage{
-			PropertyID: property.ID,
+			PropertyID: property.BaseEntry.ID,
 			ImageURL:   img.ImageURL,
 			ImageType:  img.ImageType,
 			SortOrder:  img.SortOrder,
@@ -236,7 +247,7 @@ func (h *PropertyHandler) CreateProperty(c fiber.Ctx) error {
 	// 处理标签
 	for _, tagName := range req.Tags {
 		tag := PropertyTag{
-			PropertyID: property.ID,
+			PropertyID: property.BaseEntry.ID,
 			TagName:    tagName,
 			CreateTime: time.Now(),
 		}
@@ -369,7 +380,6 @@ func (h *PropertyHandler) UpdateProperty(c fiber.Ctx) error {
 
 		property.Description = req.Description
 		property.Price = req.Price
-		property.UpdateTime = time.Now()
 	} else {
 		// 允许修改所有字段
 		var req UpdatePropertyRequest
@@ -406,7 +416,6 @@ func (h *PropertyHandler) UpdateProperty(c fiber.Ctx) error {
 		if req.Description != "" {
 			property.Description = req.Description
 		}
-		property.UpdateTime = time.Now()
 
 		// 开始事务
 		tx := h.db.Begin()
@@ -535,13 +544,6 @@ func (h *PropertyHandler) ChangePropertyStatus(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
 
-	// 记录旧状态
-	oldStatus := property.Status
-
-	// 更新状态
-	property.Status = req.NewStatus
-	property.UpdateTime = time.Now()
-
 	// 开始事务
 	tx := h.db.Begin()
 
@@ -554,7 +556,6 @@ func (h *PropertyHandler) ChangePropertyStatus(c fiber.Ctx) error {
 	// 记录状态变更日志
 	statusLog := PropertyStatusLog{
 		PropertyID:   property.ID,
-		OldStatus:    oldStatus,
 		NewStatus:    req.NewStatus,
 		ChangeReason: req.ChangeReason,
 		OperatorID:   1, // 暂时硬编码，实际应从会话中获取
@@ -595,7 +596,6 @@ func (h *PropertyHandler) CreateViewing(c fiber.Ctx) error {
 	}
 
 	viewing := PropertyViewing{
-		PropertyID:  property.ID,
 		TenantID:    req.TenantID,
 		ViewerName:  req.ViewerName,
 		ViewerPhone: req.ViewerPhone,

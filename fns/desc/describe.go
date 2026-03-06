@@ -1,4 +1,4 @@
-package describe
+package desc
 
 func ViaMap[R any](dict map[string]R) func(string) (R, bool) {
 	return func(key string) (R, bool) {

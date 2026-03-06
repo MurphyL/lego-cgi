@@ -1,4 +1,4 @@
-package principal
+package entry
 
 type Participant interface {
 	// 主体的类型
