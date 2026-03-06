@@ -78,3 +78,16 @@ type JobScheduler interface {
 	// 结果获取
 	GetResults() <-chan *JobResult
 }
+
+func Retry(ctx context.Context, executor Executor, job *Job) {
+	for i := 0; i <= job.MaxRetry; i++ {
+		err := executor.Execute(ctx, job)
+		if err == nil {
+			return
+		}
+
+		if i < job.MaxRetry {
+			time.Sleep(job.RetryInterval)
+		}
+	}
+}
