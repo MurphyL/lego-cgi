@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/hrs/middleware"
+	"murphyl.com/app/prs/middleware"
 )
 
 /**

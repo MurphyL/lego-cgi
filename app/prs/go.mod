@@ -1,4 +1,4 @@
-module murphyl.com/app/hrs
+module murphyl.com/app/prs
 
 go 1.25.0
 

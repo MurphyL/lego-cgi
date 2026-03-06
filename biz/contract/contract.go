@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/hrs/middleware"
 )
 
 /**
@@ -181,27 +180,27 @@ func NewContractHandler(dao *gorm.DB) func(router fiber.Router) {
 // RegisterRoutes 注册路由
 func (h *ContractHandler) RegisterRoutes(router fiber.Router) {
 	// 合同模板管理
-	router.Post("/contract-templates", middleware.AuthMiddleware("contract:create_template"), h.CreateContractTemplate)
-	router.Get("/contract-templates", middleware.AuthMiddleware("contract:list_templates"), h.ListContractTemplates)
-	router.Get("/contract-templates/:id", middleware.AuthMiddleware("contract:view_template"), h.GetContractTemplate)
-	router.Put("/contract-templates/:id", middleware.AuthMiddleware("contract:update_template"), h.UpdateContractTemplate)
-	router.Delete("/contract-templates/:id", middleware.AuthMiddleware("contract:delete_template"), h.DeleteContractTemplate)
+	router.Post("/contract-templates", h.CreateContractTemplate)
+	router.Get("/contract-templates", h.ListContractTemplates)
+	router.Get("/contract-templates/:id", h.GetContractTemplate)
+	router.Put("/contract-templates/:id", h.UpdateContractTemplate)
+	router.Delete("/contract-templates/:id", h.DeleteContractTemplate)
 
 	// 合同管理
-	router.Post("/contracts", middleware.AuthMiddleware("contract:create"), h.CreateContract)
-	router.Get("/contracts", middleware.AuthMiddleware("contract:list"), h.ListContracts)
-	router.Get("/contracts/:id", middleware.AuthMiddleware("contract:view"), h.GetContract)
-	router.Put("/contracts/:id", middleware.AuthMiddleware("contract:update"), h.UpdateContract)
-	router.Delete("/contracts/:id", middleware.AuthMiddleware("contract:delete"), h.DeleteContract)
-	router.Put("/contracts/:id/status", middleware.AuthMiddleware("contract:update_status"), h.ChangeContractStatus)
+	router.Post("/contracts", h.CreateContract)
+	router.Get("/contracts", h.ListContracts)
+	router.Get("/contracts/:id", h.GetContract)
+	router.Put("/contracts/:id", h.UpdateContract)
+	router.Delete("/contracts/:id", h.DeleteContract)
+	router.Put("/contracts/:id/status", h.ChangeContractStatus)
 
 	// 合同签章
-	router.Post("/contracts/:id/signatures", middleware.AuthMiddleware("contract:create_signature"), h.CreateSignature)
-	router.Get("/contracts/:id/signatures", middleware.AuthMiddleware("contract:list_signatures"), h.ListSignatures)
+	router.Post("/contracts/:id/signatures", h.CreateSignature)
+	router.Get("/contracts/:id/signatures", h.ListSignatures)
 
 	// 合同风险预警
-	router.Get("/contracts/:id/risks", middleware.AuthMiddleware("contract:list_risks"), h.ListContractRisks)
-	router.Put("/contract-risks/:id/status", middleware.AuthMiddleware("contract:update_risk_status"), h.UpdateRiskStatus)
+	router.Get("/contracts/:id/risks", h.ListContractRisks)
+	router.Put("/contract-risks/:id/status", h.UpdateRiskStatus)
 }
 
 // CreateContractTemplate 创建合同模板

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-	"murphyl.com/app/hrs/middleware"
 )
 
 /**
@@ -107,21 +106,21 @@ func NewFinanceHandler(dao *gorm.DB) func(router fiber.Router) {
 // RegisterRoutes 注册路由
 func (h *FinanceHandler) RegisterRoutes(router fiber.Router) {
 	// 账单管理
-	router.Post("/bills", middleware.AuthMiddleware("finance:create_bill"), h.CreateBill)
-	router.Get("/bills", middleware.AuthMiddleware("finance:list_bills"), h.ListBills)
-	router.Get("/bills/:id", middleware.AuthMiddleware("finance:view_bill"), h.GetBill)
-	router.Put("/bills/:id", middleware.AuthMiddleware("finance:update_bill"), h.UpdateBill)
-	router.Delete("/bills/:id", middleware.AuthMiddleware("finance:delete_bill"), h.DeleteBill)
+	router.Post("/bills", h.CreateBill)
+	router.Get("/bills", h.ListBills)
+	router.Get("/bills/:id", h.GetBill)
+	router.Put("/bills/:id", h.UpdateBill)
+	router.Delete("/bills/:id", h.DeleteBill)
 
 	// 支付管理
-	router.Post("/payments", middleware.AuthMiddleware("finance:create_payment"), h.CreatePayment)
-	router.Get("/payments", middleware.AuthMiddleware("finance:list_payments"), h.ListPayments)
-	router.Get("/payments/:id", middleware.AuthMiddleware("finance:view_payment"), h.GetPayment)
+	router.Post("/payments", h.CreatePayment)
+	router.Get("/payments", h.ListPayments)
+	router.Get("/payments/:id", h.GetPayment)
 
 	// 财务报表
-	router.Post("/financial-reports", middleware.AuthMiddleware("finance:create_report"), h.CreateFinancialReport)
-	router.Get("/financial-reports", middleware.AuthMiddleware("finance:list_reports"), h.ListFinancialReports)
-	router.Get("/financial-reports/:id", middleware.AuthMiddleware("finance:view_report"), h.GetFinancialReport)
+	router.Post("/financial-reports", h.CreateFinancialReport)
+	router.Get("/financial-reports", h.ListFinancialReports)
+	router.Get("/financial-reports/:id", h.GetFinancialReport)
 }
 
 // CreateBill 创建账单

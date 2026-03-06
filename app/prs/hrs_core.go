@@ -2,9 +2,9 @@ package main
 
 import (
 	"gorm.io/driver/mysql"
-	"murphyl.com/app/hrs/handlers/analytics"
-	"murphyl.com/app/hrs/handlers/property"
-	"murphyl.com/app/hrs/handlers/tenant"
+	"murphyl.com/app/prs/handlers/analytics"
+	"murphyl.com/app/prs/handlers/property"
+	"murphyl.com/app/prs/handlers/tenant"
 
 	"murphyl.com/lego/biz/contract"
 	"murphyl.com/lego/biz/fin"
