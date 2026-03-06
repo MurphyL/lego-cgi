@@ -72,19 +72,19 @@ func (h *systemDictHandler) RegisterRoutes(router fiber.Router) {
 	router.Get("/dict/types/:dictCode", h.GetDictTypeHandler)
 	// 查询字典类型
 	router.Get("/dict/types", func(c fiber.Ctx) error {
-		return cgi.RetrieveEntries[struct{ dictCode string }, DictType](c, h.db)
+		return cgi.RetrieveAll[struct{ dictCode string }, DictType](c, h.db)
 	})
 	// 查询字典项
 	router.Get("/dict/items", func(c fiber.Ctx) error {
-		return cgi.RetrieveEntries[struct{ DictCode, ItemValue string }, DictItem](c, h.db)
+		return cgi.RetrieveAll[struct{ DictCode, ItemValue string }, DictItem](c, h.db)
 	})
 	// 查询字典项
 	router.Get("/dict/items/:id", func(c fiber.Ctx) error {
-		return cgi.RetrieveEntry[struct{ Id string }, DictItem](c, h.db)
+		return cgi.RetrieveOne[struct{ Id string }, DictItem](c, h.db)
 	})
 	// 创建字典项
 	router.Post("/dict/items", func(c fiber.Ctx) error {
-		return cgi.CreateEntry[DictItem](c, h.db)
+		return cgi.CreateOne[DictItem](c, h.db)
 	})
 }
 

@@ -7,7 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"murphyl.com/lego/fns/oapi"
+	"github.com/tidwall/gjson"
+	"murphyl.com/lego/fns"
 )
 
 // 企业微信群聊机器人 - https://developer.work.weixin.qq.com/document/path/99110
@@ -32,17 +33,14 @@ const (
 	MessageTypeNews     messageType = "news"        // 图文消息
 )
 
-type ChatBot struct {
-	makeRequest oapi.PerformAgent[*http.Request, []byte]
-	httpClient  *http.Client
-}
+type ChatBot fns.PerformClient
 
 // 新建企业微信群聊机器人
-func NewChatBot(robotKey string) ChatBot {
+func NewChatBot(robotKey string) *ChatBot {
 	robotEndpoint := fmt.Sprintf(chatBotWebook, robotKey)
-	return ChatBot{
-		httpClient: http.DefaultClient,
-		makeRequest: func(b []byte) (*http.Request, error) {
+	return &ChatBot{
+		HttpClient: http.DefaultClient,
+		PerformAgent: func(b []byte) (*http.Request, error) {
 			httpReq, err := http.NewRequest(http.MethodPost, robotEndpoint, bytes.NewReader(b))
 			if err != nil {
 				return nil, fmt.Errorf("创建HTTP请求出错：%v", err.Error())
@@ -72,12 +70,12 @@ func (bot *ChatBot) SendMarkdownMessage(content string) error {
 func (bot *ChatBot) sendMessage(body map[string]any) error {
 	messageBytes, _ := json.Marshal(body)
 	// 构造请求
-	httpReq, err := bot.makeRequest(messageBytes)
+	httpReq, err := bot.PerformAgent(messageBytes)
 	if err != nil {
 		return fmt.Errorf("构造请求出错：%v", err.Error())
 	}
 	// 发送请求
-	httpResp, err := bot.httpClient.Do(httpReq)
+	httpResp, err := bot.HttpClient.Do(httpReq)
 	if err != nil {
 		return fmt.Errorf("发送请求出错：%v", err.Error())
 	}
@@ -86,12 +84,11 @@ func (bot *ChatBot) sendMessage(body map[string]any) error {
 	if httpResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("发送请求出错：%v", httpResp.Status)
 	}
-	if respBody, err := io.ReadAll(httpResp.Body); err == nil {
-		ret := WeworkResp{}
-		if err = json.Unmarshal(respBody, &ret); err == nil && ret.ErrCode == 0 {
+	if respBody, err := io.ReadAll(httpResp.Body); err == nil && gjson.ValidBytes(respBody) {
+		if errcode := gjson.GetBytes(respBody, "errcode").Int(); errcode == 0 {
 			return nil
 		}
-		return fmt.Errorf("读取响应出错：%v", err.Error())
+		return fmt.Errorf("读取响应出错：%v", gjson.GetBytes(respBody, "errmsg").String())
 	} else {
 		return fmt.Errorf("执行HTTP请求出错：%v", err.Error())
 	}

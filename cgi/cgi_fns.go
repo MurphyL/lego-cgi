@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func RetrieveEntries[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
+func RetrieveAll[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	var query = new(Q)
 	if err := c.Bind().All(query); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request")
@@ -18,7 +18,7 @@ func RetrieveEntries[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(records)
 }
 
-func RetrieveEntry[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
+func RetrieveOne[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	var query = new(Q)
 	if err := c.Bind().All(query); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request")
@@ -31,7 +31,7 @@ func RetrieveEntry[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(record)
 }
 
-func CreateEntry[T any](c fiber.Ctx, db *gorm.DB) error {
+func CreateOne[T any](c fiber.Ctx, db *gorm.DB) error {
 	var payload = new(T)
 	if err := c.Bind().Body(payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request")

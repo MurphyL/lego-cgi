@@ -1,4 +1,4 @@
-package finance
+package fin
 
 import (
 	"time"
@@ -11,45 +11,6 @@ import (
 /**
  * Finance 财务管理
  */
-
-// Bill 账单信息
-type Bill struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
-	BillCode    string    `gorm:"size:30;uniqueIndex" json:"bill_code"`
-	ContractID  uint      `json:"contract_id"`
-	TenantID    uint      `json:"tenant_id"`
-	PropertyID  uint      `json:"property_id"`
-	BillType    uint8     `json:"bill_type"`
-	Amount      float64   `json:"amount"`
-	DueDate     time.Time `json:"due_date"`
-	Status      uint8     `json:"status"`
-	PaidAmount  float64   `json:"paid_amount"`
-	Description string    `gorm:"size:255" json:"description"`
-	CreateTime  time.Time `json:"create_time"`
-	UpdateTime  time.Time `json:"update_time"`
-}
-
-func (*Bill) TableName() string {
-	return "hrs_bill"
-}
-
-// Payment 支付记录
-type Payment struct {
-	ID            uint      `gorm:"primaryKey" json:"id"`
-	PaymentCode   string    `gorm:"size:30;uniqueIndex" json:"payment_code"`
-	BillID        uint      `json:"bill_id"`
-	TenantID      uint      `json:"tenant_id"`
-	Amount        float64   `json:"amount"`
-	PaymentMethod uint8     `json:"payment_method"`
-	PaymentTime   time.Time `json:"payment_time"`
-	TransactionID string    `gorm:"size:100" json:"transaction_id"`
-	Status        uint8     `json:"status"`
-	CreateTime    time.Time `json:"create_time"`
-}
-
-func (*Payment) TableName() string {
-	return "hrs_payment"
-}
 
 // FinancialReport 财务报表
 type FinancialReport struct {
