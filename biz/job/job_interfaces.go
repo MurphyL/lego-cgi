@@ -53,3 +53,28 @@ type Executor interface {
 	Execute(ctx context.Context, job *Job) error
 	Name() string
 }
+
+type JobResult interface {
+}
+
+type JobScheduler interface {
+	// 生命周期管理
+	Start()
+	Stop()
+
+	// 执行器管理
+	RegisterExecutor(executor Executor)
+	ListExecutors() []Executor
+
+	// 任务管理
+	AddOrUpdateJob(job *Job) (string, error)
+	EnableJob(jobID string) error
+	DisableJob(jobID string) error
+	DeleteJob(jobID string) error
+	ExecuteNow(jobID string) error
+	ListJobs() []*Job
+	JobExists(jobID string) bool
+
+	// 结果获取
+	GetResults() <-chan *JobResult
+}
