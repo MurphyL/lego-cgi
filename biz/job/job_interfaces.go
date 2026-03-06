@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// 任务设计参考 - https://www.oschina.net/news/406862
+
 // 执行策略
 type ExecutionPolicy string
 
