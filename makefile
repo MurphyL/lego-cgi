@@ -1,10 +1,10 @@
 SHELL:=$(if $(windir),cmd.exe,/bin/sh)
 
 prs/serve:
-	go run -ldflags="-w -s -X 'main.Env=Dev' -X 'main.DataSourceName=$(GO_DSN_MYSQL)'" ./app/prs
+	go run -ldflags="-w -s -X 'main.DataSourceName=$(GO_DSN_MYSQL)'" ./app/prs
 
 rpt/serve:
-	go run -ldflags="-w -s -X 'main.Env=Dev' -X 'main.DataSourceName=$(GO_DSN_MYSQL)'" ./app/rpt
+	go run -ldflags="-w -s -X 'main.DataSourceName=$(GO_DSN_MYSQL)'" ./app/rpt
 
 prs/build:
 	go build -ldflags "-w -s -X 'main.AppTitle=v1.2.3'" ./app/prs

@@ -7,10 +7,31 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
+	"murphyl.com/lego/fns/sugar"
 )
 
+var sugarLogger = sugar.NewSugarLogger()
+
 // iam 模块是身份与访问管理模块，包含用户管理、RBAC权限控制、租户管理等功能
-// 主要功能包括：用户登录、登出、获取用户信息、重置密码、获取验证码等
+
+type AccountHandler struct {
+	db *gorm.DB
+}
+
+// NewAccountHandler 创建账户处理器
+func NewAccountHandler(dao *gorm.DB) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		sugarLogger.Info("注册账户管理模块")
+		h := &AccountHandler{db: dao}
+		h.RegisterRoutes(router)
+	}
+}
+
+func (ah *AccountHandler) RegisterRoutes(router fiber.Router) {
+	router.Get("/profile", ah.GetUserProfileHandler)
+	router.Put("/profile", ah.UpdateProfileHandler)
+	router.Post("/reset-password", ah.ResetPasswordHandler)
+}
 
 // Account 可登录账号
 type Account struct {
@@ -41,24 +62,6 @@ type CaptchaResponse struct {
 
 // 密钥，实际应用中应该从配置文件或环境变量中获取
 var jwtSecret = []byte("your-secret-key")
-
-// NewAccountHandler 创建账户处理器
-func NewAccountHandler(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		h := &AccountHandler{db: dao}
-		h.RegisterRoutes(router)
-	}
-}
-
-type AccountHandler struct {
-	db *gorm.DB
-}
-
-func (ah *AccountHandler) RegisterRoutes(router fiber.Router) {
-	router.Get("/profile", ah.GetUserProfileHandler)
-	router.Put("/profile", ah.UpdateProfileHandler)
-	router.Post("/reset-password", ah.ResetPasswordHandler)
-}
 
 // GetUserProfileHandler 获取用户信息处理函数
 func (ah *AccountHandler) GetUserProfileHandler(c fiber.Ctx) error {

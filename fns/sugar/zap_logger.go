@@ -8,6 +8,8 @@ import (
 
 var zapLogger = newZapLogger()
 
+var LoggerName = "./lego.log"
+
 func NewSugarLogger() *zap.SugaredLogger {
 	return zapLogger.Sugar()
 }
@@ -17,10 +19,10 @@ func newZapLogger() *zap.Logger {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	encoder := zapcore.NewConsoleEncoder(encoderConfig)
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	// 文件拆分
 	lumberJackSyncer := &lumberjack.Logger{
-		Filename:   "./hrs.log",
+		Filename:   LoggerName,
 		MaxSize:    10, // megabytes
 		MaxBackups: 5,
 		MaxAge:     30, // days

@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/**
+ * 从数据库中检索所有记录
+ * @param c fiber.Ctx 请求上下文
+ * @param db *gorm.DB 数据库连接
+ * @return error 错误信息
+ */
 func RetrieveAll[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	var query = new(Q)
 	if err := c.Bind().All(query); err != nil {
@@ -18,6 +24,12 @@ func RetrieveAll[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(records)
 }
 
+/**
+ * 从数据库中检索一条记录
+ * @param c fiber.Ctx 请求上下文
+ * @param db *gorm.DB 数据库连接
+ * @return error 错误信息
+ */
 func RetrieveOne[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	var query = new(Q)
 	if err := c.Bind().All(query); err != nil {
@@ -31,6 +43,12 @@ func RetrieveOne[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(record)
 }
 
+/**
+ * 创建一条记录
+ * @param c fiber.Ctx 请求上下文
+ * @param db *gorm.DB 数据库连接
+ * @return error 错误信息
+ */
 func CreateOne[T any](c fiber.Ctx, db *gorm.DB) error {
 	var payload = new(T)
 	if err := c.Bind().Body(payload); err != nil {
@@ -43,6 +61,12 @@ func CreateOne[T any](c fiber.Ctx, db *gorm.DB) error {
 	return c.Status(fiber.StatusOK).JSON(payload)
 }
 
+/**
+ * 从数据库中删除一条记录
+ * @param c fiber.Ctx 请求上下文
+ * @param db *gorm.DB 数据库连接
+ * @return error 错误信息
+ */
 func DeleteOne[Q any, T any](c fiber.Ctx, db *gorm.DB) error {
 	var query = new(Q)
 	if err := c.Bind().All(query); err != nil {
