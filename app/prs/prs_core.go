@@ -41,7 +41,7 @@ func main() {
 	// 挂载账户管理路由
 	app.Mount("/usr", iam.NewAccountHandler(dao))
 	// 挂载系统配置路由
-	app.Mount("/etc", etc.NewSystemDictHandler(dao))
+	app.Mount("/system", etc.NewSystemDictHandler(dao))
 	// 挂载财务管理路由
 	app.Mount("/fin", fin.NewFinanceHandler(dao))
 	// 挂在合同管理路由
