@@ -2,49 +2,29 @@ package dal
 
 import (
 	"fmt"
+	"net/url"
+	"time"
 
-	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
-
-	"murphyl.com/lego/dal/drivers"
-	"murphyl.com/lego/udf/lego_kits"
-	"murphyl.com/lego/udf/sugar"
-)
-
-const (
-	namespace = "dal"
+	"murphyl.com/lego/fns/sugar"
 )
 
 var sugarLogger = sugar.NewSugarLogger()
 
-func RefKey(objectKey string) string {
-	return lego_kits.ObjectKey(namespace, objectKey)
-}
-
-func New(objectKey, productKind string, dsn string) DataAccessLayer {
-	switch productKind {
-	case drivers.RdbmsMySql:
-		var conn gorm.Dialector
-		switch productKind {
-		case drivers.RdbmsMySql:
-			conn = drivers.NewMySqlConnection(dsn)
-		default:
-			panic(fmt.Errorf("不支持的数据库类型：%v", productKind))
-		}
-		dao, err := gorm.Open(conn)
-		if err != nil {
-			panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
-		}
-		return drivers.NewGromRepo(RefKey(objectKey), *dao)
-	default:
-		panic("不支持的数据访问产品：" + productKind)
+// dal 模块是数据访问层模块，定义了DataAccessLayer接口，用于数据访问操作
+func New(dial func(string) gorm.Dialector, dsn string) *gorm.DB {
+	dao, err := gorm.Open(dial(dsn))
+	if err != nil {
+		panic(fmt.Errorf("创建Gorm实例出错：%v", err.Error()))
 	}
-
-}
-
-type DataAccessLayer interface {
-	fiber.Service
-
-	RetrieveOne(dest interface{}, conds ...interface{}) error
-	RetrieveAll(dest interface{}, conds ...interface{}) error
+	dsnURL, _ := url.Parse(dsn)
+	db, _ := dao.DB()
+	sugarLogger.Infoln("数据库信息：", dao.Name(), dsnURL)
+	// SetMaxIdleConns 用于设置连接池中空闲连接的最大数量。
+	db.SetMaxIdleConns(10)
+	// SetMaxOpenConns 设置打开数据库连接的最大数量。
+	db.SetMaxOpenConns(100)
+	// SetConnMaxLifetime 设置了连接可复用的最大时间。
+	db.SetConnMaxLifetime(time.Hour)
+	return dao
 }

@@ -5,23 +5,29 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
 
-	"murphyl.com/lego/udf/sugar"
+	"murphyl.com/lego/fns/sugar"
 )
+
+// cgi 模块是CGI相关模块，提供了LegoApp结构体，用于创建和管理Fiber应用程序
+// 主要功能包括：创建应用、挂载路由、启动服务等
 
 var sugarLogger = sugar.NewSugarLogger()
 
 type LegoApp struct {
 	app *fiber.App
-	ctx context.Context
 }
 
 type AppContext interface {
 	AppTitle() string
-	BindAddress() string
+}
+
+type AppHandler interface {
+	RegisterRoutes(router fiber.Router)
 }
 
 func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
@@ -35,7 +41,7 @@ func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
 		opt(ac)
 	}
 	// 应用服务
-	la := &LegoApp{app: fiber.New(*ac), ctx: context.Background()}
+	la := &LegoApp{app: fiber.New(*ac)}
 	// 注册关闭前钩子
 	la.app.Hooks().OnPreShutdown(func() error {
 		sugarLogger.Infoln("Server is shutting down...")
@@ -52,10 +58,6 @@ func UseFiberService(service fiber.Service) LegoOption {
 	}
 }
 
-func (la *LegoApp) RouterGroup(path string, handlers ...any) {
-	la.app.Group(path, handlers...)
-}
-
 func (la *LegoApp) Mount(url string, useRouterGroup func(router fiber.Router)) {
 	useRouterGroup(la.app.Group(path.Join("/api", url)))
 }
@@ -70,7 +72,7 @@ func (la *LegoApp) Serve(addr string) {
 	sugarLogger.Info("Server started:", addr)
 	// 监听中断信号并触发优雅关闭
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
 	// 创建带超时的上下文，限制最长等待30秒
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
