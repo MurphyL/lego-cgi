@@ -6,14 +6,12 @@ import (
 	"gorm.io/driver/mysql"
 	"murphyl.com/app/prs/handlers/analytics"
 	"murphyl.com/app/prs/handlers/property"
-	"murphyl.com/app/prs/handlers/tenant"
 
-	"murphyl.com/lego/biz/conf"
 	"murphyl.com/lego/biz/erp"
+	"murphyl.com/lego/biz/etc"
 	"murphyl.com/lego/biz/fin"
 	"murphyl.com/lego/biz/iam"
 	"murphyl.com/lego/cgi"
-	"murphyl.com/lego/dal"
 	"murphyl.com/lego/fns"
 )
 
@@ -37,23 +35,21 @@ func main() {
 	// 加载配置
 	cnf := loadConfig()
 	// 初始化数据库连接
-	dao := dal.New(mysql.Open, cnf.dsn)
+	dao := cgi.NewLegoRepo(mysql.Open, cnf.dsn)
 	// 初始化应用及上下文
 	app := cgi.NewLegoApp(cnf)
 	// 挂载账户管理路由
-	app.Mount("/account", iam.NewAccountHandler(dao))
+	app.Mount("/usr", iam.NewAccountHandler(dao))
 	// 挂载系统配置路由
-	app.Mount("/system", conf.NewSystemDictHandler(dao))
+	app.Mount("/etc", etc.NewSystemDictHandler(dao))
 	// 挂载财务管理路由
-	app.Mount("/finance", fin.NewFinanceHandler(dao))
+	app.Mount("/fin", fin.NewFinanceHandler(dao))
 	// 挂在合同管理路由
-	app.Mount("/contract", erp.NewContractHandler(dao))
-	// 挂载租户管理路由
-	app.Mount("/tenant", tenant.NewTenantHandler(dao))
+	app.Mount("/erp", erp.NewContractHandler(dao))
 	// 挂载房源管理路由
-	app.Mount("/hrs", property.NewPropertyHandler(dao))
+	app.Mount("/prs", property.NewPropertyHandler(dao))
 	// 挂载数据分析路由
-	app.Mount("/hrs/rpt", analytics.NewAnalyticsHandler(dao))
+	app.Mount("/prs/rpt", analytics.NewAnalyticsHandler(dao))
 	// 运行服务
 	app.Serve(cnf.addr)
 }
