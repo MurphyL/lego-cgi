@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"path"
 	"syscall"
 	"time"
 
@@ -22,11 +21,20 @@ type LegoApp struct {
 	app *fiber.App
 }
 
-type AppContext interface {
-	AppTitle() string
+type AppMeta struct {
+	DSN     string `json:"-"`
+	Phrase  string `json:"phrase"`
+	Title   string `json:"title"`
+	Version string `json:"version"`
 }
 
-type AppHandler interface {
+type AppContext interface {
+	AppPhrase() string
+	AppTitle() string
+	AppVersion() string
+}
+
+type LegoHandler interface {
 	RegisterRoutes(router fiber.Router)
 }
 
@@ -42,6 +50,14 @@ func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
 	}
 	// 应用服务
 	la := &LegoApp{app: fiber.New(*ac)}
+	// 获取应用的基础信息
+	la.app.Get("/app/info", func(c fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"phrase":  appConfig.AppPhrase(),
+			"title":   appConfig.AppTitle(),
+			"version": appConfig.AppVersion(),
+		})
+	})
 	// 注册关闭前钩子
 	la.app.Hooks().OnPreShutdown(func() error {
 		sugarLogger.Infoln("Server is shutting down...")
@@ -52,14 +68,8 @@ func NewLegoApp(appConfig AppContext, opts ...LegoOption) *LegoApp {
 
 type LegoOption = func(cfg *fiber.Config)
 
-func UseFiberService(service fiber.Service) LegoOption {
-	return func(cfg *fiber.Config) {
-		cfg.Services = append(cfg.Services, service)
-	}
-}
-
-func (la *LegoApp) Mount(url string, useRouterGroup func(router fiber.Router)) {
-	useRouterGroup(la.app.Group(path.Join("/api", url)))
+func (la *LegoApp) Handle(path string, handler LegoHandler) {
+	handler.RegisterRoutes(la.app.Group(path))
 }
 
 func (la *LegoApp) Serve(addr string) {

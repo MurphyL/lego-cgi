@@ -12,22 +12,19 @@ import (
 
 var sugarLogger = sugar.NewSugarLogger()
 
-// ContractHandler 合同处理器
-type ContractHandler struct {
+// NewContractHandler 创建合同处理器
+func NewContractHandler(dao *gorm.DB) *contractHandler {
+	return &contractHandler{db: dao}
+}
+
+// contractHandler 合同处理器
+type contractHandler struct {
 	db *gorm.DB
 }
 
-// NewContractHandler 创建合同处理器
-func NewContractHandler(dao *gorm.DB) func(router fiber.Router) {
-	return func(router fiber.Router) {
-		sugarLogger.Info("注册合同管理模块")
-		h := &ContractHandler{db: dao}
-		h.RegisterRoutes(router)
-	}
-}
-
 // RegisterRoutes 注册路由
-func (h *ContractHandler) RegisterRoutes(router fiber.Router) {
+func (h *contractHandler) RegisterRoutes(router fiber.Router) {
+	sugarLogger.Info("注册合同管理模块")
 	// 合同管理
 	router.Get("/contracts/:id", func(c fiber.Ctx) error {
 		return cgi.RetrieveOne[Contract, Contract](c, h.db)
